@@ -8,6 +8,7 @@ homelab.json
 *.tfstate.*
 *.tfvars
 crash.log
+.terraform.lock.hcl
 
 # Secrets
 *.pem
@@ -21,3 +22,4 @@ crash.log
 
 # Env
 .env
+
