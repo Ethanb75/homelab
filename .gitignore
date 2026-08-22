@@ -1,1 +1,23 @@
+# Ignore generated homelab files
 homelab.json
+
+## Ignore CICD files -----------------------------------------
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+crash.log
+
+# Secrets
+*.pem
+*.key
+
+# Ansible
+*.retry
+
+# Misc
+.DS_Store
+
+# Env
+.env
