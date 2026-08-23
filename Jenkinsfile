@@ -2,9 +2,9 @@ pipeline {
     agent any
 
     environment {
-        PROXMOX_VE_ENDPOINT = 'https://192.168.1.121:8006/'
-        PROXMOX_VE_INSECURE = 'true'
-        PROXMOX_VE_API_TOKEN = credentials('proxmox-api-token')
+        TF_VAR_proxmox_ve_endpoint = 'https://192.168.1.121:8006/'
+        TF_VAR_proxmox_ve_insecure = 'true'
+        TF_VAR_proxmox_ve_api_token = credentials('proxmox-api-token')
     }
 
     triggers {
