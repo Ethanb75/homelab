@@ -9,3 +9,9 @@ variable "proxmox_ve_endpoint" {
   type        = string
   sensitive   = true
 }
+
+variable "proxmox_ve_insecure" {
+  description = "Whether to skip SSL verification for Proxmox VE API"
+  type        = bool
+  default     = false
+}
