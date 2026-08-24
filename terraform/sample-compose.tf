@@ -30,6 +30,10 @@ resource "proxmox_virtual_environment_vm" "sample_compose" {
   }
 
   initialization {
+    dns {
+      servers = ["1.1.1.1", "8.8.8.8"]
+    }
+
     ip_config {
       ipv4 {
         address = var.sample_vm_ip
