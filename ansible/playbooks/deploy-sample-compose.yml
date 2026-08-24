@@ -1,9 +1,9 @@
-- name: Deploy test Docker Compose app
-  hosts: test_compose
+- name: Deploy sample Docker Compose app
+  hosts: sample_compose
   become: true
 
   vars:
-    app_dir: /opt/test-compose
+    app_dir: /opt/sample-compose
 
   tasks:
     - name: Install Docker and Docker Compose
