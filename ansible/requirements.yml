@@ -1,0 +1,3 @@
+# kinda like package.json, but for ansible. This file is used to install ansible collections and roles via ansible-galaxy.
+collections:
+  - name: community.docker

@@ -1,0 +1,45 @@
+- name: Deploy test Docker Compose app
+  hosts: test_compose
+  become: true
+
+  vars:
+    app_dir: /opt/test-compose
+
+  tasks:
+    - name: Install Docker and Docker Compose
+      ansible.builtin.apt:
+        name:
+          - docker.io
+          - docker-compose
+        state: present
+        update_cache: true
+
+    - name: Enable Docker
+      ansible.builtin.service:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Create application directory
+      ansible.builtin.file:
+        path: "{{ app_dir }}/site"
+        state: directory
+        mode: "0755"
+
+    - name: Copy Docker Compose file
+      ansible.builtin.copy:
+        src: ../../app/compose.yaml
+        dest: "{{ app_dir }}/compose.yaml"
+        mode: "0644"
+
+    - name: Copy website
+      ansible.builtin.copy:
+        src: ../../app/site/index.html
+        dest: "{{ app_dir }}/site/index.html"
+        mode: "0644"
+
+    - name: Start Docker Compose project
+      community.docker.docker_compose_v2:
+        project_src: "{{ app_dir }}"
+        state: present
+        pull: missing
