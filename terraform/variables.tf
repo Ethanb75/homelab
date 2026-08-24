@@ -15,3 +15,29 @@ variable "proxmox_ve_insecure" {
   type        = bool
   default     = false
 }
+
+variable "proxmox_node" {
+  type    = string
+  # TODO - no default. always should be set
+  default = "pve-infra-02"
+}
+
+variable "template_vm_id" {
+  type    = number
+  default = 116
+}
+
+variable "sample_vm_id" {
+  type    = number
+  default = 9100
+}
+
+variable "sample_vm_ip" {
+  type    = string
+  default = "192.168.1.119/24"
+}
+
+variable "gateway" {
+  type    = string
+  default = "192.168.1.1"
+}
