@@ -31,7 +31,7 @@ resource "proxmox_virtual_environment_vm" "sample_compose" {
 
   initialization {
     dns {
-      servers = ["1.1.1.1", "8.8.8.8", "192.168.1.1"]
+      servers = ["1.1.1.1", "192.168.1.1"]
     }
 
     ip_config {
