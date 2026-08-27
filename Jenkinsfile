@@ -51,9 +51,66 @@ pipeline {
             }
         }
 
-        stage('Ansible Test') {
+        // stage('Approval') {
+        //     steps {
+        //         input message: 'Apply this Terraform plan?',
+        //               ok: 'Deploy'
+        //     }
+        // }
+
+        stage('Terraform Apply') {
             steps {
-                sh 'ansible localhost -m ping -c local'
+                dir('terraform') {
+                    sh 'terraform apply -input=false -auto-approve tfplan'
+                }
+            }
+        }
+
+        stage('Wait for SSH') {
+            steps {
+                sshagent(credentials: ['homelab-iac']) {
+                    sh '''
+                        for i in $(seq 1 30); do
+                            if ssh \
+                                -o BatchMode=yes \
+                                -o StrictHostKeyChecking=no \
+                                -o ConnectTimeout=5 \
+                                deployer@192.168.1.119 true; then
+                                echo "SSH is ready"
+                                exit 0
+                            fi
+
+                            echo "Waiting for SSH..."
+                            sleep 5
+                        done
+
+                        echo "SSH did not become available"
+                        exit 1
+                    '''
+                }
+            }
+        }
+
+        stage('Ansible Deploy') {
+            steps {
+                sshagent(credentials: ['homelab-iac']) {
+                    sh '''
+                        ansible-playbook \
+                          -i ansible/inventory/sample.ini \
+                          ansible/playbooks/deploy-sample-compose.yml
+                    '''
+                }
+            }
+        }
+
+        stage('Application Test') {
+            steps {
+                sh '''
+                    curl --fail \
+                         --retry 10 \
+                         --retry-delay 3 \
+                         http://192.168.1.119:8088
+                '''
             }
         }
     }
