@@ -18,7 +18,6 @@ variable "proxmox_ve_insecure" {
 
 variable "proxmox_node" {
   type    = string
-  # TODO - no default. always should be set
   default = "pve-infra-02"
 }
 
