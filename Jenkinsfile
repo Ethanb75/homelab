@@ -51,7 +51,7 @@ pipeline {
         stage('Terraform Plan') {
             steps {
                 dir('terraform') {
-                    sh 'terraform plan -input=false'
+                    sh 'terraform plan -input=false -out=tfplan'
                 }
             }
         }
