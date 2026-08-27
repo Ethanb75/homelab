@@ -24,7 +24,7 @@ variable "proxmox_node" {
 
 variable "template_vm_id" {
   type    = number
-  default = 116
+  default = 100
 }
 
 variable "sample_vm_id" {

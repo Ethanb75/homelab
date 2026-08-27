@@ -2,9 +2,14 @@ pipeline {
     agent any
 
     environment {
-        TF_VAR_proxmox_ve_endpoint = 'https://192.168.1.121:8006/'
-        TF_VAR_proxmox_ve_insecure = 'true'
+        TF_VAR_proxmox_ve_endpoint  = 'https://192.168.1.121:8006/'
+        TF_VAR_proxmox_ve_insecure  = 'true'
         TF_VAR_proxmox_ve_api_token = credentials('proxmox-api-token')
+        TF_VAR_proxmox_node         = 'pve-infra-02'
+        TF_VAR_template_vm_id       = '100'
+        TF_VAR_sample_vm_id         = '9100'
+        TF_VAR_sample_vm_ip         = '192.168.1.119/24'
+        TF_VAR_gateway              = '192.168.1.1'
     }
 
     triggers {
