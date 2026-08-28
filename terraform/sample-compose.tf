@@ -10,6 +10,7 @@ resource "proxmox_virtual_environment_vm" "sample_compose" {
   ]
 
   stop_on_destroy = true
+  pool_id         = "ci-cd"
 
   clone {
     vm_id = var.template_vm_id
