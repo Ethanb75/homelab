@@ -71,36 +71,30 @@ pipeline {
             }
         }
 
-        stage('Weird wait for SSH') {
+        stage('Wait for SSH') {
             steps {
-                sh 'sleep 240'
+                sshagent(credentials: ['homelab-iac']) {
+                    sh '''
+                        for i in $(seq 1 30); do
+                            if ssh \
+                                -o BatchMode=yes \
+                                -o StrictHostKeyChecking=no \
+                                -o ConnectTimeout=5 \
+                                deployer@192.168.1.119 true; then
+                                echo "SSH is ready"
+                                exit 0
+                            fi
+
+                            echo "Waiting for SSH..."
+                            sleep 5
+                        done
+
+                        echo "SSH did not become available"
+                        exit 1
+                    '''
+                }
             }
         }
-
-        // stage('Wait for SSH') {
-        //     steps {
-        //         sshagent(credentials: ['homelab-iac']) {
-        //             sh '''
-        //                 for i in $(seq 1 30); do
-        //                     if ssh \
-        //                         -o BatchMode=yes \
-        //                         -o StrictHostKeyChecking=no \
-        //                         -o ConnectTimeout=5 \
-        //                         deployer@192.168.1.119 true; then
-        //                         echo "SSH is ready"
-        //                         exit 0
-        //                     fi
-
-        //                     echo "Waiting for SSH..."
-        //                     sleep 5
-        //                 done
-
-        //                 echo "SSH did not become available"
-        //                 exit 1
-        //             '''
-        //         }
-        //     }
-        // }
 
         stage('Refresh SSH Host Key') {
             steps {
