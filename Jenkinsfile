@@ -71,28 +71,57 @@ pipeline {
             }
         }
 
-        stage('Wait for SSH') {
+        stage('Weird wait for SSH') {
             steps {
-                sshagent(credentials: ['homelab-iac']) {
-                    sh '''
-                        for i in $(seq 1 30); do
-                            if ssh \
-                                -o BatchMode=yes \
-                                -o StrictHostKeyChecking=no \
-                                -o ConnectTimeout=5 \
-                                deployer@192.168.1.119 true; then
-                                echo "SSH is ready"
-                                exit 0
-                            fi
+                sh 'sleep 240'
+            }
+        }
 
-                            echo "Waiting for SSH..."
-                            sleep 5
-                        done
+        // stage('Wait for SSH') {
+        //     steps {
+        //         sshagent(credentials: ['homelab-iac']) {
+        //             sh '''
+        //                 for i in $(seq 1 30); do
+        //                     if ssh \
+        //                         -o BatchMode=yes \
+        //                         -o StrictHostKeyChecking=no \
+        //                         -o ConnectTimeout=5 \
+        //                         deployer@192.168.1.119 true; then
+        //                         echo "SSH is ready"
+        //                         exit 0
+        //                     fi
 
-                        echo "SSH did not become available"
-                        exit 1
-                    '''
-                }
+        //                     echo "Waiting for SSH..."
+        //                     sleep 5
+        //                 done
+
+        //                 echo "SSH did not become available"
+        //                 exit 1
+        //             '''
+        //         }
+        //     }
+        // }
+
+        stage('Refresh SSH Host Key') {
+            steps {
+                sh '''
+                    VM_IP="192.168.1.119"
+
+                    mkdir -p "$HOME/.ssh"
+                    chmod 700 "$HOME/.ssh"
+
+                    ssh-keygen \
+                        -f "$HOME/.ssh/known_hosts" \
+                        -R "$VM_IP" || true
+
+                    ssh-keyscan \
+                        -H \
+                        -t ed25519 \
+                        "$VM_IP" \
+                        >> "$HOME/.ssh/known_hosts"
+
+                    chmod 600 "$HOME/.ssh/known_hosts"
+                '''
             }
         }
 
