@@ -50,8 +50,3 @@ resource "proxmox_virtual_environment_vm" "sample_compose" {
     }
   }
 }
-
-resource "proxmox_pool_membership" "sample_compose" {
-  pool_id = "ci-cd"
-  vm_id   = proxmox_virtual_environment_vm.sample_compose.vm_id
-}
