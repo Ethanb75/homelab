@@ -13,7 +13,7 @@ variable "proxmox_ve_endpoint" {
 variable "proxmox_ve_insecure" {
   description = "Whether to skip SSL verification for Proxmox VE API"
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "proxmox_node" {
