@@ -9,7 +9,7 @@ def services = [
         ip: '192.168.1.119',
         port: '8088',
         expected: 'Hello from the homelab CI/CD test!',
-        rootFolderName: 'sample-compose'
+        rootFolderName: 'sample-app'
     ],
 
     'personal-web-app': [
