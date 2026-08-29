@@ -83,10 +83,6 @@ def healthCheck(Map service) {
     """
 }
 
-def changedFiles = sh(
-        script: 'git diff --name-only HEAD~1 HEAD',
-        returnStdout: true
-    ).trim().split('\n')
 
 pipeline {
     agent any
@@ -114,6 +110,11 @@ pipeline {
             steps {
                 checkout scm
                 // log changed files
+                def changedFiles = sh(
+                    script: 'git diff --name-only HEAD~1 HEAD',
+                    returnStdout: true
+                ).trim().split('\n')
+
                 echo "Changed files: ${changedFiles.join(', ')}"
             }
         }
