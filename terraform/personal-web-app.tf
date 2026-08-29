@@ -1,7 +1,7 @@
 resource "proxmox_virtual_environment_vm" "personal_web_app" {
   name        = "personal-web-app"
   description = "Personal web and web facing"
-  node_name   = "pve-dell-laptop"
+  node_name   = "pve-infra-02"
   vm_id       = "9110"
 
   tags = [
