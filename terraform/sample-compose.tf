@@ -13,9 +13,9 @@ resource "proxmox_virtual_environment_vm" "sample_compose" {
   pool_id         = "ci-cd"
 
   clone {
-    vm_id = var.template_vm_id
+    vm_id     = var.template_vm_id
     node_name = var.template_node
-    full  = true
+    full      = true
   }
 
   cpu {
