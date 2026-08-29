@@ -1,4 +1,5 @@
 def changedFiles = []
+def servicesDeployed = []
 
 def services = [
     'sample-compose': [
@@ -196,6 +197,7 @@ pipeline {
                         stage("Health Check - ${serviceName}") {
                             healthCheck(service)
                         }
+                        servicesDeployed.add(serviceName)
                     }
                 }
             }
@@ -204,7 +206,7 @@ pipeline {
 
     post {
         success {
-            echo "Deployed ${changedFiles} services successfully."
+            echo "Deployed ${servicesDeployed} services successfully."
         }
 
         failure {
