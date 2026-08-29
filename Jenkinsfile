@@ -83,6 +83,11 @@ def healthCheck(Map service) {
     """
 }
 
+def changedFiles = sh(
+        script: 'git diff --name-only HEAD~1 HEAD',
+        returnStdout: true
+    ).trim().split('\n')
+
 pipeline {
     agent any
 
@@ -93,11 +98,6 @@ pipeline {
     //         description: 'Which service should Jenkins deploy?'
     //     )
     // }
-
-    def changedFiles = sh(
-        script: 'git diff --name-only HEAD~1 HEAD',
-        returnStdout: true
-    ).trim().split('\n')
 
     environment {
         TF_VAR_proxmox_ve_endpoint  = 'https://192.168.1.121:8006/'
