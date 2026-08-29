@@ -1,3 +1,5 @@
+def changedFiles = []
+
 def services = [
     'sample-compose': [
         inventory: 'ansible/inventory/sample.ini',
@@ -5,7 +7,8 @@ def services = [
         playbook: 'ansible/playbooks/deploy-sample-compose.yml',
         ip: '192.168.1.119',
         port: '8088',
-        expected: 'Hello from the homelab CI/CD test!'
+        expected: 'Hello from the homelab CI/CD test!',
+        rootFolderName: 'sample-compose'
     ],
 
     'personal-web-app': [
@@ -14,16 +17,21 @@ def services = [
         playbook: 'ansible/playbooks/deploy-personal-web-app.yml',
         ip: '192.168.1.128',
         port: '8089',
-        expected: 'Ethan\'s Personal Web App'
+        expected: 'Ethan\'s Personal Web App',
+        rootFolderName: 'personal-web-app'
     ]
 ]
 
-def selectedServices(Map services, String selected) {
-    if (selected == 'all') {
-        return services.keySet() as List
+def selectedServices(Map services, String[] files) {
+    def selectedList = []
+
+    for (serviceName in services.keySet()) {
+        if (files.any { it.startsWith(services[serviceName].rootFolderName) }) {
+            selectedList.add(serviceName)
+        }
     }
 
-    return [selected]
+    return selectedList
 }
 
 def waitForSsh(Map service) {
@@ -109,25 +117,6 @@ pipeline {
         stage('Checkout') {
             steps {
                 checkout scm
-                // log changed files
-                script {
-                    def changeLogSets = currentBuild.changeSets
-                    def allChangedFiles = []
-                    for (int i = 0; i < changeLogSets.size(); i++) {
-                        def entries = changeLogSets[i].items
-                        for (int j = 0; j < entries.length; j++) {
-                            def entry = entries[j]
-                            echo "Changed files in commit ${entry.commitId}:"
-                            def files = new ArrayList(entry.affectedFiles)
-                            for (int k = 0; k < files.size(); k++) {
-                                def file = files[k]
-                                allChangedFiles.add(file.path)
-                                echo "${file.editType.name} ${file.path}"
-                            }
-                        }
-                    }
-                    echo "Changed files: ${allChangedFiles.join(', ')}"
-                }
             }
         }
 
@@ -182,14 +171,18 @@ pipeline {
         stage('Deploy Selected Services') {
             steps {
                 script {
+                    changedFiles = sh(
+                        script: 'git diff --name-only HEAD~1 HEAD',
+                        returnStdout: true
+                    ).trim().split('\n')
 
-                    selectedServices(services, 'all').each { serviceName ->
+                    echo "Changed files: ${changedFiles}"
+
+                    selectedServices(services, changedFiles).each { serviceName ->
                         def service = services[serviceName]
 
                         stage("Wait for SSH - ${serviceName}") {
                             waitForSsh(service)
-                            // wait 120 seconds
-                            // sleep 120
                         }
 
                         stage("Refresh SSH Host Key - ${serviceName}") {
@@ -211,7 +204,7 @@ pipeline {
 
     post {
         success {
-            echo "Deployment completed successfully."
+            echo "Deployed ${changedFiles} services successfully."
         }
 
         failure {
