@@ -110,12 +110,24 @@ pipeline {
             steps {
                 checkout scm
                 // log changed files
-                def changedFiles = sh(
-                    script: 'git diff --name-only HEAD~1 HEAD',
-                    returnStdout: true
-                ).trim().split('\n')
-
-                echo "Changed files: ${changedFiles.join(', ')}"
+                script {
+                    def changeLogSets = currentBuild.changeSets
+                    def allChangedFiles = []
+                    for (int i = 0; i < changeLogSets.size(); i++) {
+                        def entries = changeLogSets[i].items
+                        for (int j = 0; j < entries.length; j++) {
+                            def entry = entries[j]
+                            echo "Changed files in commit ${entry.commitId}:"
+                            def files = new ArrayList(entry.affectedFiles)
+                            for (int k = 0; k < files.size(); k++) {
+                                def file = files[k]
+                                allChangedFiles.add(file.path)
+                                echo "${file.editType.name} ${file.path}"
+                            }
+                        }
+                    }
+                    echo "Changed files: ${allChangedFiles.join(', ')}"
+                }
             }
         }
 
