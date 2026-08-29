@@ -47,20 +47,20 @@ def waitForSsh(Map service) {
 
 def refreshSshHostKey(Map service) {
     sh """
-      mkdir -p /home/cicd/.ssh
-      chmod 700 /home/cicd/.ssh
+      mkdir -p /var/lib/jenkins/.ssh
+      chmod 700 /var/lib/jenkins/.ssh
 
       ssh-keygen \
-        -f /home/cicd/.ssh/known_hosts \
+        -f /var/lib/jenkins/.ssh/known_hosts \
         -R ${service.ip} || true
 
       ssh-keyscan \
         -H \
         -t ed25519 \
         ${service.ip} \
-        >> /home/cicd/.ssh/known_hosts
+        >> /var/lib/jenkins/.ssh/known_hosts
 
-      chmod 600 /home/cicd/.ssh/known_hosts
+      chmod 600 /var/lib/jenkins/.ssh/known_hosts
     """
 }
 
@@ -167,9 +167,9 @@ pipeline {
                         def service = services[serviceName]
 
                         stage("Wait for SSH - ${serviceName}") {
-                            // waitForSsh(service)
+                            waitForSsh(service)
                             // wait 120 seconds
-                            sleep 120
+                            // sleep 120
                         }
 
                         stage("Refresh SSH Host Key - ${serviceName}") {
@@ -191,7 +191,7 @@ pipeline {
 
     post {
         success {
-            echo "Deployment completed successfully"
+            echo "Deployment completed successfully."
         }
 
         failure {
