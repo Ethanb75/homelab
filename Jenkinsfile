@@ -94,6 +94,11 @@ pipeline {
     //     )
     // }
 
+    def changedFiles = sh(
+        script: 'git diff --name-only HEAD~1 HEAD',
+        returnStdout: true
+    ).trim().split('\n')
+
     environment {
         TF_VAR_proxmox_ve_endpoint  = 'https://192.168.1.121:8006/'
         TF_VAR_proxmox_ve_insecure = 'true'
@@ -108,6 +113,8 @@ pipeline {
         stage('Checkout') {
             steps {
                 checkout scm
+                // log changed files
+                echo "Changed files: ${changedFiles.join(', ')}"
             }
         }
 
