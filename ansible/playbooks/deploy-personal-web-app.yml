@@ -1,0 +1,55 @@
+- name: Deploy personal web app
+  hosts: personal_web_app
+  become: true
+
+  vars:
+    app_dir: /opt/personal-web-app
+
+  tasks:
+    - name: Configure DNS
+      ansible.builtin.copy:
+        dest: /etc/resolv.conf
+        content: |
+          nameserver 192.168.1.1
+          nameserver 1.1.1.1
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Install Docker and Docker Compose
+      ansible.builtin.apt:
+        name:
+          - docker.io
+          - docker-compose
+        state: present
+        update_cache: true
+
+    - name: Enable Docker
+      ansible.builtin.service:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Create application directory
+      ansible.builtin.file:
+        path: "{{ app_dir }}/site"
+        state: directory
+        mode: "0755"
+
+    - name: Copy Docker Compose file
+      ansible.builtin.copy:
+        src: ../../personal-web-app/compose.yml
+        dest: "{{ app_dir }}/compose.yml"
+        mode: "0644"
+
+    - name: Copy website
+      ansible.builtin.copy:
+        src: ../../personal-web-app/site/index.html
+        dest: "{{ app_dir }}/site/index.html"
+        mode: "0644"
+
+    - name: Start Docker Compose project
+      community.docker.docker_compose_v2:
+        project_src: "{{ app_dir }}"
+        state: present
+        pull: missing
