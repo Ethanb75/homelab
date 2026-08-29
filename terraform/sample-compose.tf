@@ -14,6 +14,7 @@ resource "proxmox_virtual_environment_vm" "sample_compose" {
 
   clone {
     vm_id = var.template_vm_id
+    node_name = var.template_node
     full  = true
   }
 

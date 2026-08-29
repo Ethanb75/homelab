@@ -1,7 +1,7 @@
 resource "proxmox_virtual_environment_vm" "personal_web_app" {
   name        = "personal-web-app"
   description = "Personal web and web facing"
-  node_name   = "pve-infra-02"
+  node_name   = "pve-dell-laptop"
   vm_id       = "9110"
 
   tags = [
@@ -14,6 +14,7 @@ resource "proxmox_virtual_environment_vm" "personal_web_app" {
 
   clone {
     vm_id = var.template_vm_id
+    node_name = var.template_node
     full  = true
   }
 

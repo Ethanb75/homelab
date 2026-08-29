@@ -26,6 +26,11 @@ variable "template_vm_id" {
   default = 100
 }
 
+variable "template_node" {
+  type    = string
+  default = "pve-infra-02"
+}
+
 variable "sample_vm_id" {
   type    = number
   default = 9100
