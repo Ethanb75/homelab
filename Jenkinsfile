@@ -183,8 +183,8 @@ pipeline {
                         def service = services[serviceName]
 
                         stage("Wait for SSH - ${serviceName}") {
-                            // waitForSsh(service)
-                            sleep 30
+                            waitForSsh(service)
+                            // sleep 30 - break glass, use me if strict host key check fails
                         }
 
                         stage("Refresh SSH Host Key - ${serviceName}") {
