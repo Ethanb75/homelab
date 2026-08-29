@@ -167,7 +167,9 @@ pipeline {
                         def service = services[serviceName]
 
                         stage("Wait for SSH - ${serviceName}") {
-                            waitForSsh(service)
+                            // waitForSsh(service)
+                            // wait 120 seconds
+                            sleep 120
                         }
 
                         stage("Refresh SSH Host Key - ${serviceName}") {
@@ -189,11 +191,11 @@ pipeline {
 
     post {
         success {
-            echo "Deployment completed successfully for ${params.SERVICE}."
+            echo "Deployment completed successfully"
         }
 
         failure {
-            echo "Deployment failed for ${params.SERVICE}."
+            echo "Deployment failed."
         }
     }
 }
