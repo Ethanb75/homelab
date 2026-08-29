@@ -33,7 +33,7 @@ def waitForSsh(Map service) {
           -o BatchMode=yes \
           -o StrictHostKeyChecking=accept-new \
           -o ConnectTimeout=5 \
-          -i /home/cicd/.ssh/homelab-iac_ed25519 \
+          -i /var/lib/jenkins/.ssh/homelab-iac_ed25519 \
           deployer@${service.ip} 'echo SSH ready' && exit 0
 
         echo "Waiting for SSH on ${service.ip}..."
@@ -69,7 +69,7 @@ def deployService(Map service) {
       ansible-playbook \
         -i ${service.inventory} \
         ${service.playbook} \
-        --private-key /home/cicd/.ssh/homelab-iac_ed25519
+        --private-key /var/lib/jenkins/.ssh/homelab-iac_ed25519
     """
 }
 
