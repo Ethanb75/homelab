@@ -37,6 +37,13 @@ def selectedServices(Map services, String[] files) {
 
 def waitForSsh(Map service) {
     sh """
+      mkdir -p /var/lib/jenkins/.ssh
+      chmod 700 /var/lib/jenkins/.ssh
+
+      ssh-keygen \
+        -f /var/lib/jenkins/.ssh/known_hosts \
+        -R ${service.ip} || true
+
       for i in \$(seq 1 30); do
         ssh \
           -o BatchMode=yes \
@@ -187,9 +194,9 @@ pipeline {
                             // sleep 30 - break glass, use me if strict host key check fails
                         }
 
-                        stage("Refresh SSH Host Key - ${serviceName}") {
-                            refreshSshHostKey(service)
-                        }
+                        // stage("Refresh SSH Host Key - ${serviceName}") {
+                        //     refreshSshHostKey(service)
+                        // }
 
                         stage("Deploy - ${serviceName}") {
                             deployService(service)
