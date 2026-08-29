@@ -1,19 +1,106 @@
+def services = [
+    'sample-compose': [
+        inventory: 'ansible/inventory/sample.ini',
+        group: 'sample_compose',
+        playbook: 'ansible/playbooks/deploy-sample-compose.yml',
+        ip: '192.168.1.119',
+        port: '8088',
+        expected: 'Hello from the homelab CI/CD test!'
+    ],
+
+    'personal-web-app': [
+        inventory: 'ansible/inventory/personal-web-app.ini',
+        group: 'personal_web_app',
+        playbook: 'ansible/playbooks/deploy-personal-web-app.yml',
+        ip: '192.168.1.128',
+        port: '8089',
+        expected: 'Ethan\'s Personal Web App'
+    ]
+]
+
+def selectedServices(Map services, String selected) {
+    if (selected == 'all') {
+        return services.keySet() as List
+    }
+
+    return [selected]
+}
+
+def waitForSsh(Map service) {
+    sh """
+      for i in \$(seq 1 30); do
+        ssh \
+          -o BatchMode=yes \
+          -o StrictHostKeyChecking=accept-new \
+          -o ConnectTimeout=5 \
+          -i /home/cicd/.ssh/homelab-iac_ed25519 \
+          deployer@${service.ip} 'echo SSH ready' && exit 0
+
+        echo "Waiting for SSH on ${service.ip}..."
+        sleep 10
+      done
+
+      echo "SSH did not become ready on ${service.ip}"
+      exit 1
+    """
+}
+
+def refreshSshHostKey(Map service) {
+    sh """
+      mkdir -p /home/cicd/.ssh
+      chmod 700 /home/cicd/.ssh
+
+      ssh-keygen \
+        -f /home/cicd/.ssh/known_hosts \
+        -R ${service.ip} || true
+
+      ssh-keyscan \
+        -H \
+        -t ed25519 \
+        ${service.ip} \
+        >> /home/cicd/.ssh/known_hosts
+
+      chmod 600 /home/cicd/.ssh/known_hosts
+    """
+}
+
+def deployService(Map service) {
+    sh """
+      ansible-playbook \
+        -i ${service.inventory} \
+        ${service.playbook} \
+        --private-key /home/cicd/.ssh/homelab-iac_ed25519
+    """
+}
+
+def healthCheck(Map service) {
+    sh """
+      curl \
+        --fail \
+        --show-error \
+        --silent \
+        http://${service.ip}:${service.port} | grep "${service.expected}"
+    """
+}
+
 pipeline {
     agent any
 
+    // parameters {
+    //     choice(
+    //         name: 'SERVICE',
+    //         choices: ['all', 'sample-compose', 'personal-web-app'],
+    //         description: 'Which service should Jenkins deploy?'
+    //     )
+    // }
+
     environment {
         TF_VAR_proxmox_ve_endpoint  = 'https://192.168.1.121:8006/'
-        TF_VAR_proxmox_ve_insecure  = 'true'
+        TF_VAR_proxmox_ve_insecure = 'true'
         TF_VAR_proxmox_ve_api_token = credentials('proxmox-api-token')
-        TF_VAR_proxmox_node         = 'pve-infra-02'
-        TF_VAR_template_vm_id       = '100'
-        TF_VAR_sample_vm_id         = '9100'
-        TF_VAR_sample_vm_ip         = '192.168.1.119/24'
-        TF_VAR_gateway              = '192.168.1.1'
     }
 
     triggers {
-        // Poll gh every 5 minutes
         pollSCM('H/5 * * * *')
     }
 
@@ -56,90 +143,57 @@ pipeline {
             }
         }
 
-        // stage('Approval') {
+        // stage('Manual Approval') {
         //     steps {
-        //         input message: 'Apply this Terraform plan?',
-        //               ok: 'Deploy'
+        //         input message: "Apply Terraform changes and deploy ${params.SERVICE}?"
         //     }
         // }
 
         stage('Terraform Apply') {
             steps {
                 dir('terraform') {
-                    sh 'terraform apply -input=false -auto-approve tfplan'
+                    sh 'terraform apply -input=false tfplan'
                 }
             }
         }
 
-        stage('Wait for SSH') {
+        
+
+        stage('Deploy Selected Services') {
             steps {
-                sshagent(credentials: ['homelab-iac']) {
-                    sh '''
-                        for i in $(seq 1 30); do
-                            if ssh \
-                                -o BatchMode=yes \
-                                -o StrictHostKeyChecking=no \
-                                -o ConnectTimeout=5 \
-                                deployer@192.168.1.119 true; then
-                                echo "SSH is ready"
-                                exit 0
-                            fi
+                script {
 
-                            echo "Waiting for SSH..."
-                            sleep 5
-                        done
+                    selectedServices(services, 'all').each { serviceName ->
+                        def service = services[serviceName]
 
-                        echo "SSH did not become available"
-                        exit 1
-                    '''
+                        stage("Wait for SSH - ${serviceName}") {
+                            waitForSsh(service)
+                        }
+
+                        stage("Refresh SSH Host Key - ${serviceName}") {
+                            refreshSshHostKey(service)
+                        }
+
+                        stage("Deploy - ${serviceName}") {
+                            deployService(service)
+                        }
+
+                        stage("Health Check - ${serviceName}") {
+                            healthCheck(service)
+                        }
+                    }
                 }
             }
         }
+    }
 
-        stage('Refresh SSH Host Key') {
-            steps {
-                sh '''
-                    VM_IP="192.168.1.119"
-
-                    mkdir -p "$HOME/.ssh"
-                    chmod 700 "$HOME/.ssh"
-
-                    ssh-keygen \
-                        -f "$HOME/.ssh/known_hosts" \
-                        -R "$VM_IP" || true
-
-                    ssh-keyscan \
-                        -H \
-                        -t ed25519 \
-                        "$VM_IP" \
-                        >> "$HOME/.ssh/known_hosts"
-
-                    chmod 600 "$HOME/.ssh/known_hosts"
-                '''
-            }
+    post {
+        success {
+            echo "Deployment completed successfully for ${params.SERVICE}."
         }
 
-        stage('Ansible Deploy') {
-            steps {
-                sshagent(credentials: ['homelab-iac']) {
-                    sh '''
-                        ansible-playbook \
-                          -i ansible/inventory/sample.ini \
-                          ansible/playbooks/deploy-sample-compose.yml
-                    '''
-                }
-            }
-        }
-
-        stage('Application Test') {
-            steps {
-                sh '''
-                    curl --fail \
-                         --retry 10 \
-                         --retry-delay 3 \
-                         http://192.168.1.119:8088
-                '''
-            }
+        failure {
+            echo "Deployment failed for ${params.SERVICE}."
         }
     }
 }
