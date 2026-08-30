@@ -14,7 +14,7 @@
           nameserver 1.1.1.1
         owner: root
         group: root
-        mode: "0644"
+        mode: "0644" # rw-r--r--: owner (root) can read/write, group and others read-only
 
     - name: Install Docker and Docker Compose
       ansible.builtin.apt:
@@ -34,7 +34,7 @@
       ansible.builtin.file:
         path: "{{ app_dir }}/site"
         state: directory
-        mode: "0755"
+        mode: "0755" # rwxr-xr-x: owner can read/write/enter dir, group and others can read/enter
 
     - name: Copy Docker Compose file
       ansible.builtin.copy:
