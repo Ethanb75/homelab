@@ -42,6 +42,12 @@
         dest: "{{ app_dir }}/compose.yml"
         mode: "0644"
 
+    - name: Copy Docker env file
+      ansible.builtin.copy:
+        src: ../../personal-web-app/.env
+        dest: "{{ app_dir }}/.env"
+        mode: "0644"
+
     - name: Copy website
       ansible.builtin.copy:
         src: ../../personal-web-app/site/index.html

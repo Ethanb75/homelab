@@ -191,12 +191,8 @@ pipeline {
 
                         stage("Wait for SSH - ${serviceName}") {
                             waitForSsh(service)
-                            // sleep 30 - break glass, use me if strict host key check fails
+                            // sleep 30 - break glass, use me if strict host key check keeps failing
                         }
-
-                        // stage("Refresh SSH Host Key - ${serviceName}") {
-                        //     refreshSshHostKey(service)
-                        // }
 
                         stage("Deploy - ${serviceName}") {
                             deployService(service)
