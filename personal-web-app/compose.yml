@@ -8,3 +8,13 @@ services:
 
     volumes:
       - ./site:/usr/share/nginx/html:ro
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    environment:
+      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_KEY}
+    command:
+      - tunnel
+      - --no-autoupdate
+      - run
