@@ -18,7 +18,7 @@ def services = [
         playbook: 'ansible/playbooks/deploy-personal-web-app.yml',
         ip: '192.168.1.128',
         port: '8089',
-        expected: 'Ethan\'s Personal Web App',
+        expected: 'Ethan Bellora',
         rootFolderName: 'personal-web-app'
     ]
 ]
