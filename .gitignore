@@ -22,3 +22,5 @@ crash.log
 # Env
 .env
 
+# Ignore node_modules
+node_modules/

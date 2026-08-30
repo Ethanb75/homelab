@@ -50,8 +50,8 @@
 
     - name: Copy website
       ansible.builtin.copy:
-        src: ../../personal-web-app/site/index.html
-        dest: "{{ app_dir }}/site/index.html"
+        src: ../../personal-web-app/site/
+        dest: "{{ app_dir }}/site/"
         mode: "0644"
 
     - name: Start Docker Compose project
