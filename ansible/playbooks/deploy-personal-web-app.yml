@@ -35,10 +35,10 @@
         path: "{{ app_dir }}/site"
         state: directory
         mode: "0755" # rwxr-xr-x: owner can read/write/enter dir, group and others can read/enter
-
-    - name: Create nginx config directory
+    
+    - name: Create nginz config directory
       ansible.builtin.file:
-        path: "{{ app_dir }}/nginx"
+        path: "{{ app_dir }}/site"
         state: directory
         mode: "0755" # rwxr-xr-x: owner can read/write/enter dir, group and others can read/enter
 
@@ -53,19 +53,17 @@
         src: ../../personal-web-app/.env
         dest: "{{ app_dir }}/.env"
         mode: "0644"
-    
-    # build website
-    # - name: Build website
-    #   ansible.builtin.command:
-    #     cmd: npm run build
-    #     chdir: "{{app_dir}}"
-    #   environment:
-    #     NODE_ENV: production
 
     - name: Copy website
       ansible.builtin.copy:
         src: ../../personal-web-app/site/
         dest: "{{ app_dir }}/site/"
+        mode: "0644"
+    
+    - name: Copy nginx config
+      ansible.builtin.copy:
+        src: ../../personal-web-app/nginx/default.conf
+        dest: "{{ app_dir }}/nginx/default.conf"
         mode: "0644"
 
     - name: Start Docker Compose project
