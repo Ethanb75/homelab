@@ -202,6 +202,7 @@ pipeline {
                         }
 
                         if (service.buildCommand) {
+                            echo "Building service ${serviceName} with command: ${service.buildCommand}"
                             stage("Build - ${serviceName}") {
                                 buildService(service)
                             }
