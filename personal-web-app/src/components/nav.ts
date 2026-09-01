@@ -1,5 +1,8 @@
 import { property } from '@lit/reactive-element/decorators/property.js';
 import { LitElement, css, html } from 'lit';
+import './home-page'
+import './about-page'
+import './contact-page'
 
 
 const NavStyles = css`
@@ -23,6 +26,17 @@ export class Nav extends LitElement {
     }
   }
 
+  private renderPage() {
+    switch (this.currentPage) {
+      case '/about':
+        return html`<about-page></about-page>`
+      case '/contact':
+        return html`<contact-page></contact-page>`
+      default:
+        return html`<home-page></home-page>`
+    }
+  }
+
   render() {
     return html`
       <ul>
@@ -30,6 +44,7 @@ export class Nav extends LitElement {
         <li><a href="/about" @click=${this.handleClick}>About</a></li>
         <li><a href="/contact" @click=${this.handleClick}>Contact</a></li>
       </ul>
+      ${this.renderPage()}
     `
   }
 }
