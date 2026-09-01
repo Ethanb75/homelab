@@ -14,11 +14,6 @@ const WrapperStyles = css`
  */
 @customElement('wrapper')
 export class Wrapper extends LitElement {
-  /**
-   * The number of times the button has been clicked.
-   */
-  @property({ type: Number })
-  count = 0
   static styles = [WrapperStyles]
 
   render() {
