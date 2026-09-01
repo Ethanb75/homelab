@@ -15,7 +15,7 @@ export class HomePage extends LitElement {
     return html`
     <main>
       <h1>Ethan Bellora's Website</h1>
-      <p>Welcome to my personal website! This is the home page</p>
+      <p>Welcome to my personal website! This is the home page.</p>
     </main>`
   }
 }
