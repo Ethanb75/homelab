@@ -198,7 +198,7 @@ pipeline {
                             // sleep 30 - break glass, use me if strict host key check keeps failing
                         }
 
-                        if (service.buildCommand) {
+                        if (service.build) {
                             echo "Building service ${serviceName} with command: ${service.buildCommand}"
                             stage("Build - ${serviceName}") {
                                 buildService(service)
