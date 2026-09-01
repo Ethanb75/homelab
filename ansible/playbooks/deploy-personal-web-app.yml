@@ -36,6 +36,12 @@
         state: directory
         mode: "0755" # rwxr-xr-x: owner can read/write/enter dir, group and others can read/enter
 
+    - name: Create nginx config directory
+      ansible.builtin.file:
+        path: "{{ app_dir }}/nginx"
+        state: directory
+        mode: "0755" # rwxr-xr-x: owner can read/write/enter dir, group and others can read/enter
+
     - name: Copy Docker Compose file
       ansible.builtin.copy:
         src: ../../personal-web-app/compose.yml

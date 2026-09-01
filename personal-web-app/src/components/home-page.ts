@@ -12,7 +12,11 @@ export class HomePage extends LitElement {
   static styles = [HomePageStyles]
 
   render() {
-    return html`<h1>Ethan Bellora's Website</h1>`
+    return html`
+    <main>
+      <h1>Ethan Bellora's Website</h1>
+      <p>Welcome to my personal website! This is the home page.</p>
+    </main>`
   }
 }
 
