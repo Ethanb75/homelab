@@ -1,5 +1,5 @@
 import { LitElement, css, html } from 'lit'
-import { customElement } from 'lit/decorators.js'
+// import { customElement } from 'lit/decorators.js'
 
 const WrapperStyles = css`
   :host {
@@ -11,8 +11,9 @@ const WrapperStyles = css`
  * keep these on every page, but make them optional to show/hide
  * 
  * @slot - This element has a slot
+ * @csspart ????
  */
-@customElement('wrapper')
+// @customElement('wrapper') - no need?
 export class Wrapper extends LitElement {
   static styles = [WrapperStyles]
 
@@ -41,6 +42,8 @@ export class Wrapper extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'wrapper': Wrapper
+    'app-wrapper': Wrapper
   }
 }
+
+customElements.define('app-wrapper', Wrapper)

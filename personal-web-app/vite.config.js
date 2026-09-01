@@ -11,7 +11,7 @@ export default defineConfig({
     emptyOutDir: true,
     rollupOptions: {
       input: {
-        // define pages here
+        // define static pages here
         main: resolve(__dirname, 'src/pages/index.html'),
         about: resolve(__dirname, 'src/pages/about/index.html'),
       },
