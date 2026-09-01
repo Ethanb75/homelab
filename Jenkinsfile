@@ -19,7 +19,8 @@ def services = [
         ip: '192.168.1.128',
         port: '8089',
         expected: 'Ethan Bellora',
-        rootFolderName: 'personal-web-app'
+        rootFolderName: 'personal-web-app',
+        buildCommand: 'npm run build'
     ]
 ]
 
@@ -86,6 +87,12 @@ def deployService(Map service) {
         -i ${service.inventory} \
         ${service.playbook} \
         --private-key /var/lib/jenkins/.ssh/homelab-iac_ed25519
+    """
+}
+
+def buildService(Map service) {
+    sh """
+      ${service.buildCommand}
     """
 }
 
@@ -192,6 +199,12 @@ pipeline {
                         stage("Wait for SSH - ${serviceName}") {
                             waitForSsh(service)
                             // sleep 30 - break glass, use me if strict host key check keeps failing
+                        }
+
+                        if (service.buildCommand) {
+                            stage("Build - ${serviceName}") {
+                                buildService(service)
+                            }
                         }
 
                         stage("Deploy - ${serviceName}") {

@@ -49,12 +49,12 @@
         mode: "0644"
     
     # build website
-    - name: Build website
-      ansible.builtin.command:
-        cmd: npm run build
-        chdir: "{{app_dir}}"
-      environment:
-        NODE_ENV: production
+    # - name: Build website
+    #   ansible.builtin.command:
+    #     cmd: npm run build
+    #     chdir: "{{app_dir}}"
+    #   environment:
+    #     NODE_ENV: production
 
     - name: Copy website
       ansible.builtin.copy:
