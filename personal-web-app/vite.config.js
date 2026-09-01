@@ -13,7 +13,7 @@ export default defineConfig({
       input: {
         // define static pages here
         main: resolve(__dirname, 'src/pages/index.html'),
-        about: resolve(__dirname, 'src/pages/about/index.html'),
+        // about: resolve(__dirname, 'src/pages/about/index.html'),
       },
     },
   },
