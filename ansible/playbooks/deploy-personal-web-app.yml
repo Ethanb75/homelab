@@ -52,7 +52,7 @@
     - name: Build website
       ansible.builtin.command:
         cmd: npm run build
-        chdir: ../../personal-web-app/
+        chdir: "{{app_dir}}"
       environment:
         NODE_ENV: production
 
