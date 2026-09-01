@@ -22,7 +22,7 @@ def services = [
         rootFolderName: 'personal-web-app',
         build: [
             tool: 'nodejs',
-            toolInstallation: 'NodeJS 25',
+            toolInstallation: 'Node 25',
             commands: ['node --version', 'npm ci', 'npm run build']
         ]
     ]
@@ -199,7 +199,7 @@ pipeline {
                         }
 
                         if (service.build) {
-                            echo "Building service ${serviceName} with command: ${service.buildCommand}"
+                            echo "Building service ${serviceName} with command: ${service.build.commands.join(' && ')}"
                             stage("Build - ${serviceName}") {
                                 buildService(service)
                             }
