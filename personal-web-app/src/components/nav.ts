@@ -40,7 +40,7 @@ export class Nav extends LitElement {
   render() {
     return html`
       <ul>
-        <li><a href="/" @click=${this.handleClick}>Home</a></li>
+        <li><a href="/" @click=${this.handleClick}>Ethan Bellora's website</a></li>
         <li><a href="/about" @click=${this.handleClick}>About</a></li>
         <li><a href="/contact" @click=${this.handleClick}>Contact</a></li>
       </ul>
