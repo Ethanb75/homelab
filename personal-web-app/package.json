@@ -1,14 +1,18 @@
 {
-  "name": "personal-web-app",
-  "version": "1.0.0",
-  "description": "Engineering examples",
-  "type": "commonjs",
-  "main": "index.js",
+  "name": "personal-web-app-new",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "http-server ./site -p 8080 -c-1"
+    "dev": "vite --port 3000",
+    "build": "tsc && vite build --outDir ./site --minify",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "lit": "^3.3.3"
   },
   "devDependencies": {
-    "http-server": "^14.1.1"
+    "typescript": "~6.0.2",
+    "vite": "^8.2.2"
   }
 }

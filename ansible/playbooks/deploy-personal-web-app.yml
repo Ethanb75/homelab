@@ -47,6 +47,14 @@
         src: ../../personal-web-app/.env
         dest: "{{ app_dir }}/.env"
         mode: "0644"
+    
+    # build website
+    - name: Build website
+      ansible.builtin.command:
+        cmd: npm run build
+        chdir: ../../personal-web-app/
+      environment:
+        NODE_ENV: production
 
     - name: Copy website
       ansible.builtin.copy:
