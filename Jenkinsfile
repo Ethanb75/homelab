@@ -20,7 +20,11 @@ def services = [
         port: '8089',
         expected: 'Ethan Bellora',
         rootFolderName: 'personal-web-app',
-        buildCommand: 'npm run build'
+        build: [
+            tool: 'nodejs',
+            toolInstallation: 'NodeJS 25',
+            commands: ['node --version', 'npm ci', 'npm run build']
+        ]
     ]
 ]
 
@@ -91,9 +95,18 @@ def deployService(Map service) {
 }
 
 def buildService(Map service) {
-    sh """
-      ${service.buildCommand}
-    """
+    def build = service.build
+    def commands = build.commands.join('\n')
+
+    dir(service.rootFolderName) {
+        if (build.tool == 'nodejs') {
+            nodejs(nodeJSInstallationName: build.toolInstallation) {
+                sh commands
+            }
+        } else {
+            sh commands
+        }
+    }
 }
 
 def healthCheck(Map service) {
@@ -109,14 +122,6 @@ def healthCheck(Map service) {
 
 pipeline {
     agent any
-
-    // parameters {
-    //     choice(
-    //         name: 'SERVICE',
-    //         choices: ['all', 'sample-compose', 'personal-web-app'],
-    //         description: 'Which service should Jenkins deploy?'
-    //     )
-    // }
 
     environment {
         TF_VAR_proxmox_ve_endpoint  = 'https://192.168.1.121:8006/'
@@ -167,12 +172,6 @@ pipeline {
             }
         }
 
-        // stage('Manual Approval') {
-        //     steps {
-        //         input message: "Apply Terraform changes and deploy ${params.SERVICE}?"
-        //     }
-        // }
-
         stage('Terraform Apply') {
             steps {
                 dir('terraform') {
@@ -180,8 +179,6 @@ pipeline {
                 }
             }
         }
-
-        
 
         stage('Deploy Selected Services') {
             steps {
