@@ -4,7 +4,7 @@ import { resolve } from 'path';
 const __dirname = import.meta.dirname;
 
 export default defineConfig({
-  root: resolve(__dirname, 'src/pages'),
+  root: __dirname,
   publicDir: resolve(__dirname, 'public'),
   build: {
     outDir: resolve(__dirname, 'site'),
@@ -12,7 +12,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         // define static pages here
-        main: resolve(__dirname, 'src/pages/index.html'),
+        main: resolve(__dirname, 'index.html'),
         // about: resolve(__dirname, 'src/pages/about/index.html'),
       },
     },

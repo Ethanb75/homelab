@@ -5,16 +5,16 @@ import './about-page'
 import './contact-page'
 
 
-const NavStyles = css`
+const MainStyles = css`
   :host {
     display: block;
   }
 `
 
-export class Nav extends LitElement {
+export class Main extends LitElement {
   @property({ type: String })
   public currentPage: string = window.location.pathname;
-  static styles = [NavStyles];
+  static styles = [MainStyles];
 
   private handleClick(event: Event) {
     event.preventDefault();
@@ -51,8 +51,8 @@ export class Nav extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'app-nav': Nav
+    'app-main': Main
   }
 }
 
-customElements.define('app-nav', Nav);
+customElements.define('app-main', Main);
