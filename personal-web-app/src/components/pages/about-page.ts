@@ -4,6 +4,10 @@ const AboutPageStyles = css`
   :host {
     display: block;
   }
+
+  h1 {
+    font-family: 'VT323', system-ui, sans-serif;
+  }
 `
 
 export class AboutPage extends LitElement {

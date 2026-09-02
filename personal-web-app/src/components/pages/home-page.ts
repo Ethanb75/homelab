@@ -4,9 +4,15 @@ const HomePageStyles = css`
   :host {
     display: block;
   }
+
+  h1 {
+    font-family: 'VT323', system-ui, sans-serif;
+  }
 `
 
-// BELOW, handle loading... how can we make it seem instant
+// BELOW, handle loading... quick transition with skeletons if needed
+// big loader on page components while load all heavy resources. make a util
+
 
 export class HomePage extends LitElement {
   static styles = [HomePageStyles]

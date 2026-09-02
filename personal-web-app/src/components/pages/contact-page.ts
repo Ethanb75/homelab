@@ -4,6 +4,10 @@ const ContactPageStyles = css`
   :host {
     display: block;
   }
+
+  h1 {
+    font-family: 'VT323', system-ui, sans-serif;
+  }
 `
 
 export class ContactPage extends LitElement {

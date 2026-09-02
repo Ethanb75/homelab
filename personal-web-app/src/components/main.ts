@@ -7,7 +7,7 @@ import './pages/contact-page'
 
 const MainStyles = css`
   :host {
-    width: 85vw;
+    width: 100%;
     display: flex;
     flex-direction: column;
   }
@@ -16,16 +16,21 @@ const MainStyles = css`
     margin: 2rem 0;
   }
   
-  .navigation ul {
+  .navigation ul, .footer ul {
     margin: 0;
     padding: 0;
     display: flex;
     gap: 1rem;
   }
   
-  .navigation li {
+  .navigation li, .footer li {
     list-style: none;
   }
+
+  .main-content {
+    flex-grow: 1;
+  }
+
   .footer {
   
   }
@@ -67,7 +72,9 @@ export class Main extends LitElement {
           <li><a href="/contact" @click=${this.handleClick}>Contact</a></li>
         </ul>
       </nav>
-      ${this.renderPage()}
+      <main class="main-content">
+        ${this.renderPage()}
+      </main>
       <footer class="footer">
         <!-- footer menu -->
         <div>

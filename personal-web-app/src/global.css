@@ -1,0 +1,47 @@
+@font-face {
+  font-family: 'Ubuntu Mono Regular';
+  src: url('/fonts/Ubuntu_Mono/UbuntuMono-Regular.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Ubuntu Mono Bold';
+  src: url('/fonts/Ubuntu_Mono/UbuntuMono-Bold.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+
+@font-face {
+    font-family: 'VT323';
+    src: url('/fonts/VT323/VT323-Regular.ttf') format('truetype');
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+  }
+
+html {
+    background-color: #0f0f0f;
+    color: #f0f0f0;
+}
+
+body {
+    /* font-family: 'Ubuntu Mono', system-ui, sans-serif; */
+    font-family: 'VT323', system-ui, sans-serif;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    /* align-items: center; */
+    min-width: 320px;
+    min-height: 100svh;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+    letter-spacing: 0.05rem;
+    word-spacing: 0.1rem;
+}
+
