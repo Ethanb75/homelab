@@ -1,0 +1,18 @@
+- design
+- loader
+- beer mode, click button and tip phone
+- add husky for pre/post commit hooks. add eslint and prettier
+- add check for important directories, if they're missing block commit
+- static site generation or build time generation for routes
+- ssr for maybe about and home pages?
+- canvas? svgs? simple animations see book
+- chat llm with knowledge of my skillset. about page is built based on markdown files, model uses RAG to grab them. only 1 place to update
+- maybe also react for just a page...
+- google google lighthouse score
+- demo with ssr vs csr - show load speeds on dif devices and network simulated conditions
+
+- ask chatgpt about modern web tech ideas for inspiration. see what's cool to implement
+- about links, hits a modal and explains
+- info is stored as markdown, used to render html pages during build, model uses RAG to infer using my data as context
+- caddy instead of nginx? do we care bc of cloudflare tunnels
+- tests with jest (testing with different languages?)
