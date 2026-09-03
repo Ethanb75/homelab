@@ -7,6 +7,7 @@
 - ssr for maybe about and home pages?
 - canvas? svgs? simple animations see book
 - chat llm with knowledge of my skillset. about page is built based on markdown files, model uses RAG to grab them. only 1 place to update
+- on FE show the file directory so you can preview the files being fetched. small flash over the file title if content from there is being "read"
 - maybe also react for just a page...
 - google google lighthouse score
 - demo with ssr vs csr - show load speeds on dif devices and network simulated conditions

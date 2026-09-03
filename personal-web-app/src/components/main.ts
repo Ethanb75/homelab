@@ -1,5 +1,6 @@
 import { property } from '@lit/reactive-element/decorators/property.js';
 import { LitElement, css, html } from 'lit';
+import './background-svg'
 import './pages/home-page'
 import './pages/about-page'
 import './pages/contact-page'
@@ -32,7 +33,7 @@ const MainStyles = css`
   }
 
   .footer {
-  
+
   }
 `;
 
@@ -64,7 +65,8 @@ export class Main extends LitElement {
 
   render() {
     return html`
-    <!-- navigation -->
+      <background-svg></background-svg>
+      <!-- navigation -->
       <nav class="navigation">
         <ul>
           <li><a href="/" @click=${this.handleClick}>Home</a></li>
