@@ -17,3 +17,6 @@
 - info is stored as markdown, used to render html pages during build, model uses RAG to infer using my data as context
 - caddy instead of nginx? do we care bc of cloudflare tunnels
 - tests with jest (testing with different languages?)
+- research page - put the LLM experiments here. interactive. (LLM chunking strategies to predict price in logistics)
+- research page - re-generate the website as is, create a new docker instance, run it, simple chat to tell it design
+- research page - model biases, change temps, 1k iterations, different models

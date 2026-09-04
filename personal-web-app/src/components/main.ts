@@ -11,6 +11,7 @@ const MainStyles = css`
     width: 100%;
     display: flex;
     flex-direction: column;
+    padding: 2rem;
   }
 
   .navigation {
@@ -30,6 +31,7 @@ const MainStyles = css`
 
   .main-content {
     flex-grow: 1;
+
   }
 
   .footer {
@@ -52,6 +54,7 @@ export class Main extends LitElement {
     }
   }
 
+  // faster with just html and no web components?
   private renderPage() {
     switch (this.currentPage) {
       case '/about':
