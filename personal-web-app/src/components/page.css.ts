@@ -18,6 +18,10 @@ const PageStyles = css`
     :host {
       display: block;
     }
+    
+    .page {
+      width: 75vw;
+    }
   }
  
 `
