@@ -20,11 +20,20 @@
     font-style: normal;
     font-weight: 400;
     font-display: swap;
-  }
+}
+
+
+
+:root {
+    --color-background: #32292f;
+    --color-main-text: #F0F7F4;
+    --color-primary: #99E1D9;
+    --color-secondary: #705D56;
+}
 
 html {
-    background-color: #0f0f0f;
-    color: #f0f0f0;
+    background-color: var(--color-background);
+    color: var(--color-main-text);
 }
 
 body {
@@ -41,7 +50,7 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
-    letter-spacing: 0.05rem;
+    letter-spacing: 0.07rem;
     word-spacing: 0.1rem;
 }
 

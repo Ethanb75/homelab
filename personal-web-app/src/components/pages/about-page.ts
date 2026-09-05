@@ -1,4 +1,5 @@
 import { LitElement, css, html } from 'lit'
+import { AtomsStyles } from '../atoms.css.ts'
 
 const AboutPageStyles = css`
   :host {
@@ -11,7 +12,7 @@ const AboutPageStyles = css`
 `
 
 export class AboutPage extends LitElement {
-  static styles = [AboutPageStyles]
+  static styles = [AboutPageStyles, AtomsStyles]
 
   render() {
     return html`<h1>About</h1>`

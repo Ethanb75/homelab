@@ -120,12 +120,12 @@ export class BackgroundSvg extends LitElement {
   render() {
     return html`
       <svg id="background-svg" class="background" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-        <rect width="100" height="100" fill="black" />
+        <rect width="100" height="100" fill="var(--color-background)" />
         <!-- copy me -->
          <!-- 12 rects -->
           <!-- when they animate, add them to queue, when they're done, remove them -->
            <!-- every interval, try to animate but check if rect is in the queue -->
-        <rect id="block1" class="move-up-y" width="10" height="10" fill="white"/>
+        <rect id="block1" class="move-up-y" width="10" height="10" fill="var(--color-main-text)"/>
       </svg>
     `
   }

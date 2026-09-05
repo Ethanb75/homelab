@@ -4,6 +4,7 @@ import './background-svg'
 import './pages/home-page'
 import './pages/about-page'
 import './pages/contact-page'
+import { AtomsStyles } from './atoms.css.ts'
 
 
 const MainStyles = css`
@@ -42,7 +43,7 @@ const MainStyles = css`
 export class Main extends LitElement {
   @property({ type: String })
   public currentPage: string = window.location.pathname;
-  static styles = [MainStyles];
+  static styles = [MainStyles, AtomsStyles];
 
   private handleClick(event: Event) {
     event.preventDefault();
