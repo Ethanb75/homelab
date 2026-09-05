@@ -1,21 +1,29 @@
 import { LitElement, css, html } from 'lit'
 import { AtomsStyles } from '../atoms.css.ts'
+import PageStyles from '../page.css.ts'
 
 const AboutPageStyles = css`
-  :host {
-    display: block;
+  .about-page {
+    padding: 2rem 0;
   }
 
-  h1 {
-    font-family: 'VT323', system-ui, sans-serif;
+  @media (max-width: 600px) {
+    .about-page {
+      padding: 15vw 0;
+    }
   }
 `
 
 export class AboutPage extends LitElement {
-  static styles = [AboutPageStyles, AtomsStyles]
+  static styles = [PageStyles, AboutPageStyles, AtomsStyles]
 
   render() {
-    return html`<h1>About</h1>`
+    return html`
+      <div class="page about-page">
+        <h1>About</h1>
+        <p>WIP</p>
+      </div>
+    `
   }
 }
 

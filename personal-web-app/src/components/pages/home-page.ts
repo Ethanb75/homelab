@@ -1,18 +1,8 @@
 import { LitElement, css, html } from 'lit'
 import { AtomsStyles } from '../atoms.css.ts'
+import PageStyles from '../page.css.ts'
 
 const HomePageStyles = css`
-  :host {
-    display: flex;
-    justify-content: center;
-    height: 100%;
-    align-items: center;
-  }
-
-  h1 {
-    font-family: 'VT323', system-ui, sans-serif;
-  }
-
   .links {
     display: flex;
     flex-direction: row;
@@ -26,10 +16,6 @@ const HomePageStyles = css`
   }
     
   @media (max-width: 600px) {
-    :host {
-      display: block;
-    }
-
     .home-page {
       padding: 15vw 0;
     }
@@ -46,19 +32,20 @@ const HomePageStyles = css`
 
 
 export class HomePage extends LitElement {
-  static styles = [HomePageStyles, AtomsStyles]
+  static styles = [PageStyles, HomePageStyles, AtomsStyles]
 
   render() {
     return html`
-    <div class="home-page">
-      <h1>Ethan Bellora's Website</h1>
-      <p>I'm a software engineer based in Atlanta, GA. I love solving complex problems on the web.</p>
-      <p> learn more <a href="/about">about</a> me.
-      <ul class="links">
-        <li><a href="https://github.com/Ethanb75" target="_blank" rel="noopener noreferrer">GitHub</a></li>
-        <li><a href="https://www.linkedin.com/in/ethan-bellora-610a58132/" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
-      </ul>
-    </div>`
+      <div class="page home-page">
+        <h1>Ethan Bellora's Website</h1>
+        <p>I'm a software engineer based in Atlanta, GA. I love solving complex problems on the web.</p>
+        <p> learn more <a href="/about">about</a> me.
+        <ul class="links">
+          <li><a href="https://github.com/Ethanb75" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+          <li><a href="https://www.linkedin.com/in/ethan-bellora-610a58132/" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
+        </ul>
+      </div>
+    `
   }
 }
 

@@ -9,13 +9,11 @@ import { AtomsStyles } from './atoms.css.ts'
 
 const MainStyles = css`
   :host {
-    width: 100%;
     display: flex;
     flex-direction: column;
-    padding: 2rem;
   }
-
   .navigation {
+    width: 75vw;
     margin: 2rem 0;
   }
   
