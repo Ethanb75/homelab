@@ -6,6 +6,14 @@ export const AtomsStyles = css`
     font-size: 2.5rem;
   }
 
+  p {
+    margin-bottom: 2.5rem
+  }
+
+  ul {
+    margin-bottom: 2.5rem
+  }
+
   a, a:visited {
     color: #AF9085;  
   }
