@@ -1,6 +1,7 @@
 import { LitElement, css, html } from 'lit'
 import { AtomsStyles } from '../atoms.css.ts'
 import PageStyles from '../page.css.ts'
+import '../link'
 
 const HomePageStyles = css`
   .links {
@@ -9,10 +10,16 @@ const HomePageStyles = css`
     gap: 1rem;
     list-style: none;
     padding: 0;
+    margin-top: 2rem;
   }
 
   .home-page {
-    padding: 2rem 0;
+    padding: 0 0 2rem 0;
+  }
+
+  .home-page-title {
+    margin-bottom: 2rem;
+    margin-top: 0rem;
   }
     
   @media (max-width: 600px) {
@@ -37,9 +44,12 @@ export class HomePage extends LitElement {
   render() {
     return html`
       <div class="page home-page">
-        <h1>Ethan Bellora's Website</h1>
-        <p>I'm a software engineer based in Atlanta, GA. I love solving complex problems on the web.</p>
-        <p> learn more <a href="/about">about</a> me.
+        <h1 class="home-page-title">Ethan Bellora's Website</h1>
+        <p>
+          I'm a software engineer based in Atlanta, GA. <br />
+          I love solving complex problems on the web.<br />
+          learn more <app-link href="/about">about</a> me.
+        </p>
         <ul class="links">
           <li><a href="https://github.com/Ethanb75" target="_blank" rel="noopener noreferrer">GitHub</a></li>
           <li><a href="https://www.linkedin.com/in/ethan-bellora-610a58132/" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>

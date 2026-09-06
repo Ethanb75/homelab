@@ -1,9 +1,11 @@
 import { property } from '@lit/reactive-element/decorators/property.js';
 import { LitElement, css, html, type PropertyValues } from 'lit';
 import './background-svg'
+import './link'
 import './pages/home-page'
 import './pages/about-page'
 import './pages/contact-page'
+import './pages/404-page.ts'
 import { AtomsStyles } from './atoms.css.ts'
 
 
@@ -47,37 +49,9 @@ export class Main extends LitElement {
 
   constructor() {
     super();
-    window.addEventListener('popstate', () => {
+    window.addEventListener('app-location-change', () => {
       this.currentPage = window.location.pathname;
     });
-  }
-
-  protected firstUpdated(changedProperties: PropertyValues) {
-    super.firstUpdated(changedProperties);
-
-    //set the current page based on the current URL path
-    this.shadowRoot?.querySelectorAll(`.navigation a.button-link[href="${this.currentPage}"]`)[0]?.classList.add('active');
-  }
-
-  private handleClick(event: Event): HTMLAnchorElement {
-    event.preventDefault();
-    const target = event.target as HTMLAnchorElement;
-    const href = target.getAttribute('href');
-    if (href) {
-      window.history.pushState({}, '', href);
-      this.currentPage = href;
-    }
-
-    return target;
-  }
-
-  private handleNavClick(event: Event) {
-    const target = this.handleClick(event);
-
-    // this is stupid
-    const navLinks = this.shadowRoot?.querySelectorAll('.navigation a');
-    navLinks?.forEach(link => link.classList.remove('active'));
-    target.classList.add('active');
   }
 
   protected update(changedProperties: PropertyValues) {
@@ -94,8 +68,10 @@ export class Main extends LitElement {
         return html`<about-page></about-page>`
       case '/contact':
         return html`<contact-page></contact-page>`
-      default:
+      case '/':
         return html`<home-page></home-page>`
+      default:
+        return html`<four-oh-four-page></four-oh-four-page>`
     }
   }
 
@@ -105,9 +81,9 @@ export class Main extends LitElement {
       <!-- navigation -->
       <nav class="navigation">
         <ul>
-          <li><a class="button-link" href="/" @click=${this.handleNavClick}>Home</a></li>
-          <li><a class="button-link" href="/about" @click=${this.handleNavClick}>About</a></li>
-          <li><a class="button-link" href="/contact" @click=${this.handleNavClick}>Contact</a></li>
+          <li><app-link href="/" nav>Home</app-link></li>
+          <li><app-link href="/about" nav>About</app-link></li>
+          <li><app-link href="/contact" nav>Contact</app-link></li>
         </ul>
       </nav>
       <main class="main-content">
@@ -117,9 +93,9 @@ export class Main extends LitElement {
         <!-- footer menu -->
         <div>
           <ul>
-            <li><a class="button-link" href="/" @click=${this.handleNavClick}>Home</a></li>
-            <li><a class="button-link" href="/about" @click=${this.handleClick}>About</a></li>
-            <li><a class="button-link" href="/contact" @click=${this.handleClick}>Contact</a></li>
+            <li><app-link href="/">Home</app-link></li>
+            <li><app-link href="/about">About</app-link></li>
+            <li><app-link href="/contact">Contact</app-link></li>
           </ul>
         </div>
         <p>copyright &copy; 2026 Ethan Bellora</p>
