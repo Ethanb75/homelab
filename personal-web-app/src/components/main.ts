@@ -18,13 +18,16 @@ const MainStyles = css`
     width: 75vw;
     margin: 2rem 0;
   }
+
+  .navigation ul {
+    left: -1rem;
+  }
   
   .navigation ul, .footer ul {
     margin: 0;
     padding: 0;
     display: flex;
     gap: 0.5rem;
-    left: -1rem;
     position: relative;
   }
   
