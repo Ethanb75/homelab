@@ -25,6 +25,21 @@ def services = [
             toolInstallation: 'Node 25',
             commands: ['node --version', 'npm ci', 'npm run build']
         ]
+    ],
+
+    'qq-api': [
+        inventory: 'ansible/inventory/qq-api.ini',
+        group: 'qq_api',
+        playbook: 'ansible/playbooks/deploy-qq-api.yml',
+        ip: '192.168.1.130',
+        port: '8080',
+        expected: 'Ethan Bellora',
+        rootFolderName: 'qq-api',
+        build: [
+            tool: 'nodejs',
+            toolInstallation: 'Node 25',
+            commands: ['node --version', 'npm ci', 'npm run build']
+        ]
     ]
 ]
 
