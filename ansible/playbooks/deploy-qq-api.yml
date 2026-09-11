@@ -29,6 +29,24 @@
         name: docker
         state: started
         enabled: true
+    
+    - name: Create application directory
+      ansible.builtin.file:
+        path: "{{ app_dir }}"
+        state: directory
+        mode: "0755"
+    
+    # - name: Create application and model directories
+    #   ansible.builtin.file:
+    #     path: "{{ item }}"
+    #     state: directory
+    #     owner: root
+    #     group: root
+    #     mode: "0755"
+    #   loop:
+    #     - "{{ app_dir }}"
+    #     - /srv/llama-models
+    #     - /srv/llama-models/cache
 
     - name: Copy Docker Compose file
       ansible.builtin.copy:
