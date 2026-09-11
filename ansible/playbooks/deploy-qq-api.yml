@@ -36,11 +36,11 @@
         dest: "{{ app_dir }}/compose.yml"
         mode: "0644"
 
-    - name: Copy Docker env file
-      ansible.builtin.copy:
-        src: ../../qq-api/.env
-        dest: "{{ app_dir }}/.env"
-        mode: "0644"
+    # - name: Copy Docker env file
+    #   ansible.builtin.copy:
+    #     src: ../../qq-api/.env
+    #     dest: "{{ app_dir }}/.env"
+    #     mode: "0644"
 
     - name: Start Docker Compose project
       community.docker.docker_compose_v2:
