@@ -1,0 +1,50 @@
+services:
+  llama-api:
+    build:
+      context: https://github.com/XHToken/llama.cpp.git#master
+      dockerfile: .devops/cpu.Dockerfile
+      target: server
+
+    image: homelab/llama-spark:cpu
+    container_name: llama-api
+    restart: unless-stopped
+
+    ports:
+      - "8080:8080"
+
+    environment:
+      # Put HF-downloaded models somewhere persistent.
+      LLAMA_CACHE: /models/cache
+      LLAMA_API_KEY: "${LLAMA_API_KEY}"
+
+    volumes:
+      - /srv/llama-models:/models
+
+    command:
+      - "--hf-repo"
+      - "${MODEL_REF:-XHToken/Spark-X2.5-4B-GGUF:Q4_K_M}"
+
+      - "--host"
+      - "0.0.0.0"
+
+      - "--port"
+      - "8080"
+
+      - "--ctx-size"
+      - "${LLAMA_CTX_SIZE:-8192}"
+
+      - "--parallel"
+      - "1"
+
+      - "--metrics"
+
+    healthcheck:
+      test:
+        - CMD
+        - curl
+        - -f
+        - http://localhost:8080/health
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
