@@ -34,12 +34,7 @@ def services = [
         ip: '192.168.1.130',
         port: '8080',
         expected: 'Ethan Bellora',
-        rootFolderName: 'qq-api',
-        build: [
-            tool: 'nodejs',
-            toolInstallation: 'Node 25',
-            commands: ['node --version', 'npm ci', 'npm run build']
-        ]
+        rootFolderName: 'qq-api'
     ]
 ]
 
