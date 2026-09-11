@@ -27,7 +27,7 @@ resource "proxmox_virtual_environment_vm" "qq_api" {
 
   memory {
     dedicated = 12288
-    floating = 0
+    floating  = 0
   }
 
   network_device {
