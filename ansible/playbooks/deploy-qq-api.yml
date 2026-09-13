@@ -37,16 +37,16 @@
         mode: "0755"
     
     # - name: Create application and model directories
-    #   ansible.builtin.file:
-    #     path: "{{ item }}"
-    #     state: directory
-    #     owner: root
-    #     group: root
-    #     mode: "0755"
-    #   loop:
-    #     - "{{ app_dir }}"
-    #     - /srv/llama-models
-    #     - /srv/llama-models/cache
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+      loop:
+        - "{{ app_dir }}"
+        - /srv/llama-models
+        - /srv/llama-models/cache
 
     - name: Copy Docker Compose file
       ansible.builtin.copy:
