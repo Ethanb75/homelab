@@ -30,13 +30,13 @@
         state: started
         enabled: true
     
-    - name: Create application directory
-      ansible.builtin.file:
-        path: "{{ app_dir }}"
-        state: directory
-        mode: "0755"
+    # - name: Create application directory
+    #   ansible.builtin.file:
+    #     path: "{{ app_dir }}"
+    #     state: directory
+    #     mode: "0755"
     
-    # - name: Create application and model directories
+    - name: Create application and model directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -47,6 +47,13 @@
         - "{{ app_dir }}"
         - /srv/llama-models
         - /srv/llama-models/cache
+
+
+    # - name: Download Spark X2.5 Q4_K_M
+    #   ansible.builtin.get_url:
+    #     url: "https://huggingface.co/XHToken/Spark-X2.5-4B-GGUF/resolve/main/Spark-X2.5-4B-Q4_K_M.gguf"
+    #     dest: "/srv/llama-models/Spark-X2.5-4B-Q4_K_M.gguf"
+    #     mode: "0644"
 
     - name: Copy Docker Compose file
       ansible.builtin.copy:

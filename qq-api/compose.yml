@@ -5,10 +5,13 @@ services:
     restart: unless-stopped
 
     command:
+      # uncomment if ansible download
       # - "-m"
       # - "/models/Spark-X2.5-4B-Q4_K_M.gguf"
+      # - "-hf"
+      # - "XHToken/Spark-X2.5-4B-GGUF:Q4_K_M"
       - "-hf"
-      - "XHToken/Spark-X2.5-4B-GGUF:Q4_K_M"
+      - "bartowski/Qwen_Qwen3-4B-Thinking-2507-GGUF:Q4_K_M"
       - "--host"
       - "0.0.0.0"
       - "--port"
@@ -19,7 +22,10 @@ services:
       - "--api-key"
       - "${LLAMA_API_KEY}"
 
+
     volumes:
+      # uncomment if ansible download
+      # - /srv/llama-models:/models:ro
       - /srv/llama-models:/models
 
     ports:
