@@ -17,8 +17,26 @@ services:
       - "--port"
       - "8080"
       # 8k context
+      # - "--ctx-size"
+      # - "8192"
+      # 32k context size
       - "--ctx-size"
-      - "8192"
+      - "32768"
+      # overall generation limit
+      - "--n-predict"
+      - "4096"
+      # only 2k tokens on resoning
+      - "--reasoning-budget"
+      - "2048"
+
+      - "--reasoning-format"
+      - "deepseek"
+      # server will only handle 1 request per
+      - "--parallel"
+      - "1"
+      # a different implementation to speed up inference and reduce memory usage
+      - "--flash-attn"
+      - "on"
       - "--api-key"
       - "${LLAMA_API_KEY}"
 
