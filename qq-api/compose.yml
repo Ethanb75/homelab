@@ -5,8 +5,10 @@ services:
     restart: unless-stopped
 
     command:
-      - "-m"
-      - "/models/Spark-X2.5-4B-Q4_K_M.gguf"
+      # - "-m"
+      # - "/models/Spark-X2.5-4B-Q4_K_M.gguf"
+      - "-hf"
+      - "XHToken/Spark-X2.5-4B-GGUF:Q4_K_M"
       - "--host"
       - "0.0.0.0"
       - "--port"
