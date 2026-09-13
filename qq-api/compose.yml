@@ -20,7 +20,7 @@ services:
       - "${LLAMA_API_KEY}"
 
     volumes:
-      - /srv/llama-models:/models:ro
+      - /srv/llama-models:/models
 
     ports:
       - "8080:8080"
