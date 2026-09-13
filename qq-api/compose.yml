@@ -31,7 +31,8 @@ services:
       - "8080"
 
       - "--ctx-size"
-      - "${LLAMA_CTX_SIZE:-8192}"
+      - "32768"
+      # - "${LLAMA_CTX_SIZE:-8192}"
 
       - "--parallel"
       - "1"
