@@ -1,43 +1,29 @@
 services:
-  llama-api:
-    build:
-      context: https://github.com/XHToken/llama.cpp.git#master
-      dockerfile: .devops/cpu.Dockerfile
-      target: server
-
-    image: homelab/llama-spark:cpu
-    container_name: llama-api
+  llama-server:
+    image: ghcr.io/ggml-org/llama.cpp:server
+    container_name: llama-server
     restart: unless-stopped
+
+    command:
+      - "-m"
+      - "/models/Spark-X2.5-4B-Q4_K_M.gguf"
+      - "--host"
+      - "0.0.0.0"
+      - "--port"
+      - "8080"
+      - "--ctx-size"
+      - "8192"
+      - "--api-key"
+      - "${LLAMA_API_KEY}"
+
+    volumes:
+      - /srv/llama-models:/models:ro
 
     ports:
       - "8080:8080"
 
-    environment:
-      # cash
-      LLAMA_CACHE: /models/cache
-      LLAMA_API_KEY: "${LLAMA_API_KEY}"
-
-    volumes:
-      - /srv/llama-models:/models
-
-    command:
-      - "--hf-repo"
-      - "${MODEL_REF:-XHToken/Spark-X2.5-4B-GGUF:Q4_K_M}"
-
-      - "--host"
-      - "0.0.0.0"
-
-      - "--port"
-      - "8080"
-
-      - "--ctx-size"
-      - "${LLAMA_CTX_SIZE:-8192}"
-
-      - "--parallel"
-      - "1"
-
-      - "--metrics"
-
+    networks:
+      - ai
     healthcheck:
       test:
         - CMD
@@ -48,3 +34,28 @@ services:
       timeout: 5s
       retries: 30
       start_period: 30s
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:v0.11.3
+    container_name: open-webui
+    restart: unless-stopped
+
+    ports:
+      - "3000:8080"
+
+    volumes:
+      - open-webui-data:/app/backend/data
+
+    depends_on:
+      - llama-server
+
+    networks:
+      - ai
+
+networks:
+  ai:
+
+# where open-webui stores it's data
+volumes:
+  open-webui-data:
+

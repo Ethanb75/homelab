@@ -34,7 +34,10 @@ def services = [
         ip: '192.168.1.130',
         port: '8080',
         expected: 'Ethan Bellora',
-        rootFolderName: 'qq-api'
+        rootFolderName: 'qq-api',
+        env: [
+            [credentialId: 'llama-api-key', varName: 'LLAMA_API_KEY']
+        ]
     ]
 ]
 
@@ -93,6 +96,24 @@ def refreshSshHostKey(Map service) {
 
       chmod 600 /var/lib/jenkins/.ssh/known_hosts
     """
+}
+
+def writeEnvFile(Map service) {
+    def bindings = service.env.collect { entry ->
+        string(credentialsId: entry.credentialId, variable: entry.varName)
+    }
+    def body = service.env.collect { entry -> "${entry.varName}=\$${entry.varName}" }.join('\n')
+
+    withCredentials(bindings) {
+        dir(service.rootFolderName) {
+            sh """
+              cat > .env <<EOF
+${body}
+EOF
+              chmod 600 .env
+            """
+        }
+    }
 }
 
 def deployService(Map service) {
@@ -215,8 +236,20 @@ pipeline {
                             }
                         }
 
-                        stage("Deploy - ${serviceName}") {
-                            deployService(service)
+                        if (service.env) {
+                            stage("Write Env - ${serviceName}") {
+                                writeEnvFile(service)
+                            }
+                        }
+
+                        try {
+                            stage("Deploy - ${serviceName}") {
+                                deployService(service)
+                            }
+                        } finally {
+                            if (service.env) {
+                                sh "rm -f ${service.rootFolderName}/.env"
+                            }
                         }
 
                         stage("Health Check - ${serviceName}") {
