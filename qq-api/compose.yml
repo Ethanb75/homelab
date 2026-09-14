@@ -1,51 +1,76 @@
 services:
-  llama-api:
-    build:
-      context: https://github.com/XHToken/llama.cpp.git#master
-      dockerfile: .devops/cpu.Dockerfile
-      target: server
-
-    image: homelab/llama-spark:cpu
-    container_name: llama-api
+  llama-server:
+    image: ghcr.io/ggml-org/llama.cpp:server
+    container_name: llama-server
     restart: unless-stopped
+
+    command:
+      # uncomment if ansible download
+      - "-m"
+      - "/models/Spark-X2.5-4B-Q4_K_M.gguf"
+      # - "-hf"
+      # - "bartowski/Qwen_Qwen3-4B-Thinking-2507-GGUF:Q4_K_M"
+      - "--host"
+      - "0.0.0.0"
+      - "--port"
+      - "8080"
+      # 8k context
+      # - "--ctx-size"
+      # - "8192"
+      # 32k context size
+      - "--ctx-size"
+      - "32768"
+      # overall generation limit
+      - "--n-predict"
+      - "4096"
+      # only 2k tokens on resoning
+      - "--reasoning-budget"
+      - "2048"
+
+      - "--reasoning-format"
+      - "deepseek"
+      # server will only handle 1 request per
+      - "--parallel"
+      - "1"
+      # a different implementation to speed up inference and reduce memory usage
+      - "--flash-attn"
+      - "on"
+      - "--api-key"
+      - "${LLAMA_API_KEY}"
+
+
+    volumes:
+      # uncomment if ansible download
+      - /srv/llama-models:/models:ro
+      # - /srv/llama-models:/models
 
     ports:
       - "8080:8080"
 
-    environment:
-      # cash
-      LLAMA_CACHE: /models/cache
-      LLAMA_API_KEY: "${LLAMA_API_KEY}"
+    networks:
+      - ai
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:v0.11.3
+    container_name: open-webui
+    restart: unless-stopped
+
+    ports:
+      - "3000:8080"
 
     volumes:
-      - /srv/llama-models:/models
+      - open-webui-data:/app/backend/data
 
-    command:
-      - "--hf-repo"
-      - "${MODEL_REF:-XHToken/Spark-X2.5-4B-GGUF:Q4_K_M}"
+    depends_on:
+      - llama-server
 
-      - "--host"
-      - "0.0.0.0"
+    networks:
+      - ai
 
-      - "--port"
-      - "8080"
+networks:
+  ai:
 
-      - "--ctx-size"
-      - "32768"
-      # - "${LLAMA_CTX_SIZE:-8192}"
+# where open-webui stores it's data
+volumes:
+  open-webui-data:
 
-      - "--parallel"
-      - "1"
-
-      - "--metrics"
-
-    healthcheck:
-      test:
-        - CMD
-        - curl
-        - -f
-        - http://localhost:8080/health
-      interval: 10s
-      timeout: 5s
-      retries: 30
-      start_period: 30s
