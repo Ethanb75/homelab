@@ -5,7 +5,7 @@ services:
     restart: unless-stopped
 
     command:
-      # uncomment if ansible download.
+      # uncomment if ansible download
       - "-m"
       - "/models/Spark-X2.5-4B-Q4_K_M.gguf"
       # - "-hf"
