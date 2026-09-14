@@ -32,7 +32,7 @@ def services = [
         group: 'qq_api',
         playbook: 'ansible/playbooks/deploy-qq-api.yml',
         ip: '192.168.1.130',
-        port: '8080',
+        port: '3000',
         expected: 'Ethan Bellora',
         rootFolderName: 'qq-api',
         env: [
@@ -140,6 +140,7 @@ def buildService(Map service) {
     }
 }
 
+// update below to allow for the method to be passed in
 def healthCheck(Map service) {
     sh """
       curl \
