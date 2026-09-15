@@ -54,6 +54,12 @@
         dest: "/srv/llama-models/Qwen3-4B-Instruct-2507-Q4_K_M.gguf"
         mode: "0644"
 
+    - name: Download Qwen3-1.7B-Q4_K_M
+      ansible.builtin.get_url:
+        url: "https://huggingface.co/ggml-org/Qwen3-1.7B-GGUF/resolve/main/Qwen3-1.7B-Q4_K_M.gguf"
+        dest: "/srv/llama-models/Qwen3-1.7B-Q4_K_M.gguf"
+        mode: "0644"
+
     - name: Copy Docker Compose file
       ansible.builtin.copy:
         src: ../../qq-api/compose.yml
@@ -71,3 +77,4 @@
         project_src: "{{ app_dir }}"
         state: present
         pull: missing
+        remove_orphans: true

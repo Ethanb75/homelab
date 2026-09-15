@@ -45,11 +45,12 @@ let historyPatched = false;
 
 function patchHistory() {
   if (historyPatched) return;
+  
   historyPatched = true;
 
   const notify = () => window.dispatchEvent(new Event('app-location-change'));
-
   const originalPushState = history.pushState.bind(history);
+
   history.pushState = (...args: Parameters<typeof history.pushState>) => {
     originalPushState(...args);
     notify();
@@ -104,7 +105,9 @@ export class AppLink extends LitElement {
         class="button-link ${this.active ? 'active' : ''}"
         href=${this.href}
         @click=${this.handleClick}
-      ><slot></slot></a>
+      >
+        <slot></slot>
+      </a>
     `;
   }
 }

@@ -3,7 +3,7 @@ import { css } from 'lit';
 export const AtomsStyles = css`
   h1 {
     font-family: 'VT323', system-ui, sans-serif;
-    font-size: 2.5rem;
+    font-size: 3rem;
   }
 
   p {
