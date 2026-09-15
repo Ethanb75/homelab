@@ -5,6 +5,7 @@ import PageStyles from '../page.css.ts'
 const AboutPageStyles = css`
   .about-page {
     padding: 2rem 0;
+    margin-bottom: 10rem;
   }
 
   .about-picture {
@@ -13,6 +14,11 @@ const AboutPageStyles = css`
 
   .about-picture img {
     width: 800px
+  }
+
+  .projects-list {
+    margin-bottom: 5rem;
+    contain: content;
   }
 
   .projects-list dt {
