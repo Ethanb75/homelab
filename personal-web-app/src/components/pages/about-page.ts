@@ -39,7 +39,6 @@ const AboutPageStyles = css`
   }
 
   @media (max-width: 2000px) {
-
     .about-picture img {
       width: 500px
     }
@@ -52,6 +51,11 @@ const AboutPageStyles = css`
 
     .about-picture img {
       width: 100%
+    }
+
+    .projects-list dd {
+      margin-bottom: 5rem;
+      margin-left: 0rem;
     }
   }
 `
