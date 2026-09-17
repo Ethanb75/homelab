@@ -1,0 +1,12 @@
+- setup tsc
+- start with sample data from llm_eng
+- setup injest
+- setup eval, litellm
+- start simple then:
+- requering (5?)
+- eval test suite
+- chromadb (or some other vector db)
+- setup daily quota
+- setup simple chat interface
+- compose file for injest server (ftp?)
+- compose

@@ -13,6 +13,7 @@
     "lit": "^3.3.3"
   },
   "devDependencies": {
+    "@types/node": "^22.20.3",
     "typescript": "~6.0.2",
     "vite": "^8.2.2"
   }
