@@ -15,7 +15,7 @@ const CHUNKING_CONCURRENCY = 10;
 const CHROMA_COLLECTION = "docs";
 const PROCESSED_DOC_VECTOR_DB_LOCATION = "./processed_db"
 
-
+// eventually, run me once daily
 
 // TODO, stream? or maybe we process in batches for large datasets
 const getAllDocuments = (path: string): KnowledgeDocument[] => {
@@ -133,8 +133,6 @@ const injest = async (): Promise<void> => {
     console.log(`loaded ${documents.length} documents`)
     const chunks = await convertDocumentsToChunks(documents);
     console.log(`loaded ${chunks.length} chunks`);
-    
-    // chunk files
     // create embeddings
 }
 

@@ -1,7 +1,8 @@
-- setup tsc
-- start with sample data from llm_eng
 - setup injest
-- setup eval, litellm
+- setup chroma vector db, setup dev
+- setup node service to answer (next.js server?) litellm?
+- setup simple ui to infer
+- setup eval
 - start simple then:
 - requering (5?)
 - eval test suite

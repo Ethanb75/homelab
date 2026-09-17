@@ -26,7 +26,6 @@ def services = [
             commands: ['node --version', 'npm ci', 'npm run build']
         ]
     ],
-
     'qq-api': [
         inventory: 'ansible/inventory/qq-api.ini',
         group: 'qq_api',
@@ -37,6 +36,18 @@ def services = [
         rootFolderName: 'qq-api',
         env: [
             [credentialId: 'llama-api-key', varName: 'LLAMA_API_KEY']
+        ]
+    ],
+    'vector-db': [
+        inventory: 'ansible/inventory/vector-db.ini',
+        group: 'vector_db',
+        playbook: 'ansible/playbooks/deploy-vector-db.yml',
+        ip: '192.168.1.131',
+        port: '6333',
+        expected: '',
+        rootFolderName: 'vector-db',
+        env: [
+            [credentialId: 'qdrant-vector-db-key', varName: 'QDRANT__SERVICE__API_KEY']
         ]
     ]
 ]
