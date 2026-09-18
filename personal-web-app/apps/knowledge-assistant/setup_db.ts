@@ -1,3 +1,5 @@
+// run me first to create the collection in qdrant
+
 import "dotenv/config";
 import { QdrantClient } from "@qdrant/js-client-rest";
 
