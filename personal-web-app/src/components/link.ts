@@ -41,32 +41,6 @@ const LinkStyles = css`
   }
 `;
 
-let historyPatched = false;
-
-function patchHistory() {
-  if (historyPatched) return;
-  
-  historyPatched = true;
-
-  const notify = () => window.dispatchEvent(new Event('app-location-change'));
-  const originalPushState = history.pushState.bind(history);
-
-  history.pushState = (...args: Parameters<typeof history.pushState>) => {
-    originalPushState(...args);
-    notify();
-  };
-
-  const originalReplaceState = history.replaceState.bind(history);
-  history.replaceState = (...args: Parameters<typeof history.replaceState>) => {
-    originalReplaceState(...args);
-    notify();
-  };
-
-  window.addEventListener('popstate', notify);
-}
-
-patchHistory();
-
 export class AppLink extends LitElement {
   static styles = [LinkStyles];
 
@@ -96,7 +70,14 @@ export class AppLink extends LitElement {
 
   private handleClick(event: Event) {
     event.preventDefault();
-    history.pushState({}, '', this.href);
+
+    this.dispatchEvent(
+      new CustomEvent('app-navigate', {
+        detail: { href: this.href },
+        bubbles: true,
+        composed: true,
+      }),
+    );
   }
 
   render() {
