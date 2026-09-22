@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { basename, extname, join } from "node:path";
 import { createHash } from "node:crypto";
-import { KnowledgeDocument } from "./types";
+import { KnowledgeDocument } from "./types.js";
 
 const DOCUMENT_TYPES_TO_INGEST = [".md"];
 

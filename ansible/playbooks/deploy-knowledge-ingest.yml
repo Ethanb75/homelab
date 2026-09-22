@@ -1,0 +1,96 @@
+- name: Deploy knowledge ingest
+  hosts: knowledge_ingest
+  become: true
+
+  vars:
+    app_dir: /opt/knowledge-ingest
+
+  tasks:
+    - name: Configure DNS
+      ansible.builtin.copy:
+        dest: /etc/resolv.conf
+        content: |
+          nameserver 192.168.1.1
+          nameserver 1.1.1.1
+        owner: root
+        group: root
+        mode: "0644" # rw-r--r--: owner (root) can read/write, group and others read-only
+
+    - name: Install Docker and Docker Compose
+      ansible.builtin.apt:
+        name:
+          - docker.io
+          - docker-compose
+        state: present
+        update_cache: true
+
+    - name: Enable Docker
+      ansible.builtin.service:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Create application directory
+      ansible.builtin.file:
+        path: "{{ app_dir }}"
+        state: directory
+        mode: "0755"
+
+    # Persistent data: only ever created, never copied over, so deploys don't touch the contents.
+    # Owned by the deploy user so documents can be dropped in without sudo.
+    - name: Create knowledge base directory
+      ansible.builtin.file:
+        path: "{{ app_dir }}/knowledge-base"
+        state: directory
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: "0755"
+
+    # uid 1000 is the node user the container runs as
+    - name: Create ingest state directory
+      ansible.builtin.file:
+        path: "{{ app_dir }}/app-state"
+        state: directory
+        owner: "1000"
+        group: "1000"
+        mode: "0755"
+
+    - name: Copy Docker Compose file
+      ansible.builtin.copy:
+        src: ../../knowledge-ingest/compose.yml
+        dest: "{{ app_dir }}/compose.yml"
+        mode: "0644"
+
+    - name: Copy Docker env file
+      ansible.builtin.copy:
+        src: ../../knowledge-ingest/.env
+        dest: "{{ app_dir }}/.env"
+        mode: "0600"
+
+    # Listed explicitly so node_modules/, dist/ and the local knowledge-base/ are never shipped
+    - name: Copy worker source
+      ansible.builtin.copy:
+        src: "../../knowledge-ingest/{{ item }}"
+        dest: "{{ app_dir }}/{{ item }}"
+        mode: "0644"
+      loop:
+        - src/
+        - package.json
+        - package-lock.json
+        - tsconfig.json
+        - Dockerfile
+        - .dockerignore
+        - crontab
+
+    - name: Start Docker Compose project
+      community.docker.docker_compose_v2:
+        project_src: "{{ app_dir }}"
+        state: present
+        pull: missing
+        remove_orphans: true
+        # the default ("policy") only builds when the image is missing, so code changes would
+        # never make it into the running container
+        build: always
+        # there is no HTTP endpoint for Jenkins to check, so fail the deploy here if the
+        # container doesn't come up
+        wait: true

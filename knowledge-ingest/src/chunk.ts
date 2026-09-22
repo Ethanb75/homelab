@@ -2,8 +2,8 @@ import { generateText, Output } from "ai";
 import { openai } from "@ai-sdk/openai";
 import { z } from "zod";
 import pLimit from "p-limit";
-import { createContentHash } from "./documents";
-import { ChunkResult, DocumentChunk, KnowledgeDocument } from "./types";
+import { createContentHash } from "./documents.js";
+import { ChunkResult, DocumentChunk, KnowledgeDocument, LoadedDocument } from "./types.js";
 
 const CHUNKING_MODEL = "gpt-4.1-nano";
 const AVERAGE_CHUNK_SIZE = 100;
@@ -18,7 +18,7 @@ const chunkToResult = (document: KnowledgeDocument, chunk: DocumentChunk): Chunk
     },
 });
 
-export const createChunksFromDocument = async (document: KnowledgeDocument): Promise<ChunkResult[]> => {
+export const createChunksFromDocument = async (document: LoadedDocument): Promise<ChunkResult[]> => {
     const numChunks = Math.trunc(document.text.length / AVERAGE_CHUNK_SIZE) + 1;
 
     const chatTemplate = `
@@ -60,7 +60,7 @@ export const createChunksFromDocument = async (document: KnowledgeDocument): Pro
     return output.chunks.map(chunk => chunkToResult(document, chunk));
 };
 
-export const convertDocumentsToChunks = async (documents: KnowledgeDocument[]): Promise<ChunkResult[]> => {
+export const convertDocumentsToChunks = async (documents: LoadedDocument[]): Promise<ChunkResult[]> => {
     const limit = pLimit(CHUNKING_CONCURRENCY);
     const results = await Promise.allSettled(documents.map(doc => limit(() => createChunksFromDocument(doc))));
 

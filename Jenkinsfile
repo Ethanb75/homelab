@@ -49,6 +49,17 @@ def services = [
         env: [
             [credentialId: 'qdrant-vector-db-key', varName: 'QDRANT__SERVICE__API_KEY']
         ]
+    ],
+    // scheduled worker with no HTTP port - its playbook waits for the container to be running instead
+    'knowledge-ingest': [
+        inventory: 'ansible/inventory/knowledge-ingest.ini',
+        group: 'knowledge_ingest',
+        playbook: 'ansible/playbooks/deploy-knowledge-ingest.yml',
+        ip: '192.168.1.132',
+        rootFolderName: 'knowledge-ingest',
+        env: [
+            [credentialId: 'openai-api-key', varName: 'OPENAI_API_KEY']
+        ]
     ]
 ]
 
@@ -264,8 +275,10 @@ pipeline {
                             }
                         }
 
-                        stage("Health Check - ${serviceName}") {
-                            healthCheck(service)
+                        if (service.port) {
+                            stage("Health Check - ${serviceName}") {
+                                healthCheck(service)
+                            }
                         }
                         servicesDeployed.add(serviceName)
                     }

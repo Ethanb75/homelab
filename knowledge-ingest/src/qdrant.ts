@@ -1,6 +1,6 @@
 import { QdrantClient } from "@qdrant/js-client-rest";
 import { createHash } from "node:crypto";
-import { ChunkResult } from "./types";
+import { ChunkResult } from "./types.js";
 
 const QDRANT_COLLECTION_NAME = process.env.QDRANT_COLLECTION_NAME;
 const QDRANT_URL = process.env.QDRANT_URL;
@@ -35,7 +35,7 @@ export const ensureCollectionExists = async (): Promise<string> => {
     return collectionName;
 };
 
-export const upsertChunks = async (chunks: ChunkResult[], embeddings: number[][]): Promise<void> => {
+export const upsertChunks = async (chunks: ChunkResult[], embeddings: number[][]): Promise<string[]> => {
     const collectionName = await ensureCollectionExists();
 
     const points = chunks.map((chunk, i) => ({
@@ -52,7 +52,18 @@ export const upsertChunks = async (chunks: ChunkResult[], embeddings: number[][]
         points,
     });
 
-    console.log(`upserted ${points.length} points into collection "${collectionName}":`, points.map(p => p.id));
+    return points.map(point => point.id);
+};
+
+export const deleteChunks = async (ids: string[]): Promise<void> => {
+    if (ids.length === 0) return;
+
+    const collectionName = await ensureCollectionExists();
+
+    await qdrant.delete(collectionName, {
+        wait: true,
+        points: ids,
+    });
 };
 
 export const getCollectionStats = async () => {

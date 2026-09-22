@@ -1,4 +1,4 @@
-import { embedMany } from "ai";
+import { embedMany, embed } from "ai";
 import { openai } from "@ai-sdk/openai";
 
 const EMBEDDING_MODEL = "text-embedding-3-large";

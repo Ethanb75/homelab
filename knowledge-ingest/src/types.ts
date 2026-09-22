@@ -3,6 +3,10 @@ export type KnowledgeDocument = {
     source: string;
 };
 
+export type LoadedDocument = KnowledgeDocument & {
+    text: string;
+};
+
 export type DocumentChunk = {
     headline: string;
     summary: string;

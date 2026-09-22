@@ -385,6 +385,8 @@ The fields have the following meanings:
 | `expected`       | Text that must appear in the HTTP response       |
 | `rootFolderName` | Root application folder that triggers deployment |
 
+`port` and `expected` are optional. Services with no HTTP endpoint (such as the `knowledge-ingest` scheduled worker) leave out `port`, which skips the Jenkins health check, so their playbook should verify the deployment itself (for example with `wait: true` on `docker_compose_v2`).
+
 The `rootFolderName` value is especially important.
 
 Jenkins checks changed files and selects a service when a changed path starts with its configured application folder.
