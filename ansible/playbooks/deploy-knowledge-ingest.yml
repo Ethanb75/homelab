@@ -4,6 +4,9 @@
 
   vars:
     app_dir: /opt/knowledge-ingest
+    # the node user both containers run as (USER node in the Dockerfiles)
+    container_uid: "1000"
+    container_gid: "1000"
 
   tasks:
     - name: Configure DNS
@@ -37,23 +40,27 @@
         mode: "0755"
 
     # Persistent data: only ever created, never copied over, so deploys don't touch the contents.
-    # Owned by the deploy user so documents can be dropped in without sudo.
+    # Owned by the deploy user so documents can be dropped in without sudo, and group-writable by
+    # the container user so the crawler can add its own subdirectories.
     - name: Create knowledge base directory
       ansible.builtin.file:
         path: "{{ app_dir }}/knowledge-base"
         state: directory
         owner: "{{ ansible_user }}"
-        group: "{{ ansible_user }}"
-        mode: "0755"
+        group: "{{ container_gid }}"
+        mode: "2775" # setgid: files dropped in by the deploy user stay readable by the container group
 
-    # uid 1000 is the node user the container runs as
-    - name: Create ingest state directory
+    # Created here rather than left to Docker, which would create missing bind mount sources as root
+    - name: Create state directories
       ansible.builtin.file:
-        path: "{{ app_dir }}/app-state"
+        path: "{{ app_dir }}/{{ item }}"
         state: directory
-        owner: "1000"
-        group: "1000"
+        owner: "{{ container_uid }}"
+        group: "{{ container_gid }}"
         mode: "0755"
+      loop:
+        - app-state
+        - crawler-state
 
     - name: Copy Docker Compose file
       ansible.builtin.copy:
