@@ -75,6 +75,7 @@
         mode: "0644"
       loop:
         - src/
+        - crawler/
         - package.json
         - package-lock.json
         - tsconfig.json
