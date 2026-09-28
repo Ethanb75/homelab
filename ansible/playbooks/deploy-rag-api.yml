@@ -1,0 +1,75 @@
+- name: Deploy rag api
+  hosts: rag_api
+  become: true
+
+  vars:
+    app_dir: /opt/rag-api
+
+  tasks:
+    - name: Configure DNS
+      ansible.builtin.copy:
+        dest: /etc/resolv.conf
+        content: |
+          nameserver 192.168.1.1
+          nameserver 1.1.1.1
+        owner: root
+        group: root
+        mode: "0644" # rw-r--r--: owner (root) can read/write, group and others read-only
+
+    - name: Install Docker and Docker Compose
+      ansible.builtin.apt:
+        name:
+          - docker.io
+          - docker-compose
+        state: present
+        update_cache: true
+
+    - name: Enable Docker
+      ansible.builtin.service:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Create application directory
+      ansible.builtin.file:
+        path: "{{ app_dir }}"
+        state: directory
+        mode: "0755"
+
+    - name: Copy Docker Compose file
+      ansible.builtin.copy:
+        src: ../../rag-api/compose.yml
+        dest: "{{ app_dir }}/compose.yml"
+        mode: "0644"
+
+    - name: Copy Docker env file
+      ansible.builtin.copy:
+        src: ../../rag-api/.env
+        dest: "{{ app_dir }}/.env"
+        mode: "0600"
+      no_log: true # holds the OpenAI key
+
+    # Listed explicitly so node_modules/ and dist/ are never shipped
+    - name: Copy api source
+      ansible.builtin.copy:
+        src: "../../rag-api/{{ item }}"
+        dest: "{{ app_dir }}/{{ item }}"
+        mode: "0644"
+      loop:
+        - src/
+        - package.json
+        - package-lock.json
+        - tsconfig.json
+        - Dockerfile
+        - .dockerignore
+
+    - name: Start Docker Compose project
+      community.docker.docker_compose_v2:
+        project_src: "{{ app_dir }}"
+        state: present
+        pull: missing
+        remove_orphans: true
+        # the default ("policy") only builds when the image is missing, so code changes would
+        # never make it into the running container
+        build: always
+        wait: true

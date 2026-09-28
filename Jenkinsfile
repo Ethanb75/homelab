@@ -60,6 +60,19 @@ def services = [
         env: [
             [credentialId: 'openai-api-key', varName: 'OPENAI_API_KEY']
         ]
+    ],
+    'rag-api': [
+        inventory: 'ansible/inventory/rag-api.ini',
+        group: 'rag_api',
+        playbook: 'ansible/playbooks/deploy-rag-api.yml',
+        ip: '192.168.1.133',
+        port: '8090',
+        healthPath: '/health/ready',
+        expected: 'ok',
+        rootFolderName: 'rag-api',
+        env: [
+            [credentialId: 'openai-api-key', varName: 'OPENAI_API_KEY']
+        ]
     ]
 ]
 
@@ -163,13 +176,20 @@ def buildService(Map service) {
 }
 
 // update below to allow for the method to be passed in
+// healthPath is optional and defaults to the root; the retries cover the gap between the
+// container starting and the app listening
 def healthCheck(Map service) {
+    def path = service.healthPath ?: ''
+
     sh """
       curl \
         --fail \
         --show-error \
         --silent \
-        http://${service.ip}:${service.port} | grep "${service.expected}"
+        --retry 10 \
+        --retry-delay 3 \
+        --retry-connrefused \
+        http://${service.ip}:${service.port}${path} | grep "${service.expected}"
     """
 }
 
