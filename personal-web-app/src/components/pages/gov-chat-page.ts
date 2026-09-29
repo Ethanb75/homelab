@@ -1,5 +1,7 @@
 import { state } from '@lit/reactive-element/decorators/state.js';
 import { LitElement, css, html } from 'lit'
+import type { PropertyValues } from 'lit'
+import { createRef, ref } from 'lit/directives/ref.js'
 import { AtomsStyles } from '../atoms.css.ts'
 import PageStyles from '../page.css.ts'
 
@@ -39,6 +41,34 @@ const GovChatPageStyles = css`
 
   .error {
     color: #E88D8D;
+  }
+
+  .more-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font: inherit;
+    font-size: 0.9rem;
+    color: var(--color-primary);
+    background: none;
+    border: none;
+    padding: 0;
+    margin-left: 0.25rem;
+    cursor: pointer;
+  }
+
+  .more-toggle .arrow {
+    display: inline-block;
+    transition: transform 0.15s ease;
+  }
+
+  .more-toggle .arrow.open {
+    transform: rotate(180deg);
+  }
+
+  .details {
+    font-size: 0.9rem;
+    color: #AF9085;
   }
 
   .sources {
@@ -111,7 +141,18 @@ export class GovChatPage extends LitElement {
   @state()
   private pending = false
 
+  @state()
+  private showDetails = false
+
   private abortController?: AbortController
+
+  private bottomRef = createRef<HTMLDivElement>()
+
+  updated(changedProperties: PropertyValues) {
+    if (changedProperties.has('turns')) {
+      this.bottomRef.value?.scrollIntoView({ block: 'end' })
+    }
+  }
 
   disconnectedCallback() {
     // closing the connection tells rag-api to stop generating
@@ -126,6 +167,10 @@ export class GovChatPage extends LitElement {
 
   private get lastTurn() {
     return this.turns[this.turns.length - 1]
+  }
+
+  private toggleDetails = () => {
+    this.showDetails = !this.showDetails
   }
 
   private handleKeyDown = (event: KeyboardEvent) => {
@@ -224,21 +269,32 @@ export class GovChatPage extends LitElement {
   }
 
   private renderSources(sources: Source[]) {
-    const names = [...new Set(sources.map(s => basename(s.source)))]
+    const maxSources = 4;
+    const names = [...new Set(sources.map(s => basename(s.source)).slice(0, maxSources))]
     if (!names.length) return null
     return html`
       <ul class="sources">
+        <span>sources:</span>
         ${names.map(name => html`<li>${name}</li>`)}
       </ul>
     `
   }
 
+  // maybe use me to change content to links?
+  private renderAnswer(answer: string) {
+    // for now just return answer
+    return answer
+  }
+
   private renderTurn(turn: Turn) {
     return html`
       <div class="turn">
-        <span class="label">&gt; you</span>
+        <span class="label">&gt; you:</span>
         <p class="question">${turn.question}</p>
-        <p class="answer">${turn.answer || (this.pending && turn === this.lastTurn && !turn.error ? '...' : '')}</p>
+        <span class="label">&gt; 🤖:</span>
+        <p class="answer">${(turn.answer && this.renderAnswer(turn.answer))
+          || 
+          (this.pending && turn === this.lastTurn && !turn.error ? '...' : '')}</p>
         ${turn.error ? html`<p class="error">${turn.error}</p>` : null}
         ${this.renderSources(turn.sources)}
       </div>
@@ -249,8 +305,27 @@ export class GovChatPage extends LitElement {
     return html`
       <div class="page gov-chat-page">
         <h1>Gov Chat</h1>
-        <p>Ask questions about Georgia executive orders. Answers are generated from the source documents listed underneath each one.</p>
-        ${this.turns.map(turn => this.renderTurn(turn))}
+        <p>
+          Ask questions about Georgia executive orders. Answers are generated from the source documents listed underneath each one.
+          <button
+            type="button"
+            class="more-toggle"
+            aria-expanded=${this.showDetails}
+            @click=${this.toggleDetails}
+          >
+            more <span class="arrow ${this.showDetails ? 'open' : ''}">▾</span>
+          </button>
+        </p>
+        ${this.showDetails ? html`
+          <p class="details">
+            GA Executive orders page is crawled once a day and the knowledge is ingested into a qdrant database. An api hits the qdrant
+            database to support chat completion with gpt-4.1-nano. All services (including FE) are running on my homelab
+          </p>
+        ` : null}
+        <div class="chat-response">
+          ${this.turns.map(turn => this.renderTurn(turn))}
+          
+        </div>
         <form class="chat-form" @submit=${this.handleSubmit}>
           <textarea
             name="question"
@@ -260,6 +335,7 @@ export class GovChatPage extends LitElement {
           ></textarea>
           <button type="submit" ?disabled=${this.pending}>Send</button>
         </form>
+        <div style="margin-top: 5rem" ${ref(this.bottomRef)}></div>
       </div>
     `
   }
