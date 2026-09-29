@@ -8,6 +8,7 @@ import type { PixelTransition } from './pixel-transition'
 import './pages/home-page'
 import './pages/about-page'
 import './pages/contact-page'
+import './pages/gov-chat-page'
 import './pages/404-page.ts'
 import { AtomsStyles } from './atoms.css.ts'
 
@@ -114,6 +115,8 @@ export class Main extends LitElement {
         return html`<about-page></about-page>`
       case '/contact':
         return html`<contact-page></contact-page>`
+      case '/projects/gov-chat':
+        return html`<gov-chat-page></gov-chat-page>`
       case '/':
         return html`<home-page></home-page>`
       default:
@@ -131,6 +134,7 @@ export class Main extends LitElement {
           <li><app-link href="/" nav>Home</app-link></li>
           <li><app-link href="/about" nav>About</app-link></li>
           <li><app-link href="/contact" nav>Contact</app-link></li>
+          <li><app-link href="/projects/gov-chat" nav>Gov Chat</app-link></li>
         </ul>
       </nav>
       <main class="main-content">
@@ -143,6 +147,7 @@ export class Main extends LitElement {
             <li><app-link href="/">Home</app-link></li>
             <li><app-link href="/about">About</app-link></li>
             <li><app-link href="/contact">Contact</app-link></li>
+            <li><app-link href="/projects/gov-chat">Gov Chat</app-link></li>
           </ul>
         </div>
         <p>copyright &copy; 2026 Ethan Bellora</p>
