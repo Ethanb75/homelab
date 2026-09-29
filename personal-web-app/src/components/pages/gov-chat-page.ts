@@ -304,7 +304,7 @@ export class GovChatPage extends LitElement {
   render() {
     return html`
       <div class="page gov-chat-page">
-        <h1>Gov Chat</h1>
+        <h1>Gov Chat - WIP</h1>
         <p>
           Ask questions about Georgia executive orders. Answers are generated from the source documents listed underneath each one.
           <button
