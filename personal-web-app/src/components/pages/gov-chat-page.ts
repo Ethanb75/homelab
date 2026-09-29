@@ -100,8 +100,13 @@ const GovChatPageStyles = css`
     border-color: var(--color-primary);
   }
 
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+  }
+
   button {
-    align-self: flex-end;
     font: inherit;
     font-size: 1.2rem;
     color: var(--color-background);
@@ -109,6 +114,12 @@ const GovChatPageStyles = css`
     border: none;
     padding: 0.25rem 1rem;
     cursor: pointer;
+  }
+
+  button.reset {
+    color: var(--color-primary);
+    background: transparent;
+    border: 1px solid var(--color-primary);
   }
 
   button:disabled {
@@ -148,6 +159,8 @@ export class GovChatPage extends LitElement {
 
   private bottomRef = createRef<HTMLDivElement>()
 
+  private textareaRef = createRef<HTMLTextAreaElement>()
+
   updated(changedProperties: PropertyValues) {
     if (changedProperties.has('turns')) {
       this.bottomRef.value?.scrollIntoView({ block: 'end' })
@@ -180,6 +193,19 @@ export class GovChatPage extends LitElement {
     }
   }
 
+  // throws away the current chat, aborting any answer still streaming
+  private handleReset = () => {
+    this.abortController?.abort()
+    this.abortController = undefined
+    this.turns = []
+    this.pending = false
+    const textarea = this.textareaRef.value
+    if (textarea) {
+      textarea.value = ''
+      textarea.focus()
+    }
+  }
+
   private handleSubmit = (event: SubmitEvent) => {
     event.preventDefault()
     const form = event.target as HTMLFormElement
@@ -194,18 +220,20 @@ export class GovChatPage extends LitElement {
   private async ask(question: string) {
     this.pending = true
     this.turns = [...this.turns, { question, answer: '', sources: [] }]
-    this.abortController = new AbortController()
+    const controller = new AbortController()
+    this.abortController = controller
 
     try {
       const res = await fetch('/api/v1/rag/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ messages: [{ role: 'user', content: question }], stream: true }),
-        signal: this.abortController.signal,
+        signal: controller.signal,
       })
 
       if (!res.ok || !res.body) {
         const body = await res.json().catch(() => null)
+        if (controller.signal.aborted) return
         this.updateLastTurn({ error: errorForStatus(res.status, body) })
         return
       }
@@ -218,7 +246,8 @@ export class GovChatPage extends LitElement {
       if ((error as Error).name === 'AbortError') return
       this.updateLastTurn({ error: 'Something went wrong' })
     } finally {
-      this.pending = false
+      // a reset may have already started a new request, don't clobber its pending state
+      if (this.abortController === controller) this.pending = false
     }
   }
 
@@ -332,8 +361,18 @@ export class GovChatPage extends LitElement {
             maxlength=${MAX_MESSAGE_LENGTH}
             placeholder="Ask a question..."
             @keydown=${this.handleKeyDown}
+            ${ref(this.textareaRef)}
           ></textarea>
-          <button type="submit" ?disabled=${this.pending}>Send</button>
+          <div class="form-actions">
+            <button
+              type="button"
+              class="reset"
+              title="Start a new chat"
+              ?disabled=${!this.turns.length}
+              @click=${this.handleReset}
+            >↻ New chat</button>
+            <button type="submit" ?disabled=${this.pending}>Send</button>
+          </div>
         </form>
         <div style="margin-top: 5rem" ${ref(this.bottomRef)}></div>
       </div>
