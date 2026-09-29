@@ -19,11 +19,11 @@ resource "proxmox_virtual_environment_vm" "knowledge_ingest" {
   }
 
   cpu {
-    cores = 1
+    cores = 3
   }
 
   memory {
-    dedicated = 1024
+    dedicated = 4096
   }
 
   network_device {

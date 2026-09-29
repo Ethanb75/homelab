@@ -23,7 +23,7 @@ resource "proxmox_virtual_environment_vm" "personal_web_app" {
   }
 
   memory {
-    dedicated = 1024
+    dedicated = 2048
   }
 
   network_device {
