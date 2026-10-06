@@ -18,6 +18,7 @@ interface Turn {
   question: string
   answer: string
   sources: Source[]
+  model?: string
   error?: string
 }
 
@@ -41,6 +42,13 @@ const GovChatPageStyles = css`
 
   .error {
     color: #E88D8D;
+  }
+
+  .model {
+    display: block;
+    font-size: 0.8rem;
+    color: #AF9085;
+    opacity: 0.8;
   }
 
   .more-toggle {
@@ -281,6 +289,9 @@ export class GovChatPage extends LitElement {
     const payload = data ? JSON.parse(data) : {}
 
     switch (event) {
+      case 'model':
+        this.updateLastTurn({ model: payload.model })
+        return false
       case 'sources':
         this.updateLastTurn({ sources: payload })
         return false
@@ -321,6 +332,7 @@ export class GovChatPage extends LitElement {
         <span class="label">&gt; you:</span>
         <p class="question">${turn.question}</p>
         <span class="label">&gt; 🤖:</span>
+        ${turn.model ? html`<span class="model">${turn.model}</span>` : null}
         <p class="answer">${(turn.answer && this.renderAnswer(turn.answer))
           || 
           (this.pending && turn === this.lastTurn && !turn.error ? '...' : '')}</p>
@@ -348,7 +360,7 @@ export class GovChatPage extends LitElement {
         ${this.showDetails ? html`
           <p class="details">
             GA Executive orders page is crawled once a day and the knowledge is ingested into a qdrant database. An api hits the qdrant
-            database to support chat completion with gpt-4.1-nano. All services (including FE) are running on my homelab
+            database to support chat completion with a model (shown above each answer). All services (including FE) are running on my homelab
           </p>
         ` : null}
         <div class="chat-response">
