@@ -71,7 +71,8 @@ def services = [
         expected: 'ok',
         rootFolderName: 'rag-api',
         env: [
-            [credentialId: 'openai-api-key', varName: 'OPENAI_API_KEY']
+            [credentialId: 'openai-api-key', varName: 'OPENAI_API_KEY'],
+            [credentialId: 'govbot-cf-worker-api-key', varName: 'CLOUDFLARE_WORKER_API_KEY']
         ]
     ]
 ]
