@@ -74,6 +74,19 @@ def services = [
             [credentialId: 'openai-api-key', varName: 'OPENAI_API_KEY'],
             [credentialId: 'govbot-cf-worker-api-key', varName: 'CLOUDFLARE_WORKER_API_KEY']
         ]
+    ],
+    // database with no HTTP port - its playbook waits for the container to be healthy instead
+    'govbot-postgres-db': [
+        inventory: 'ansible/inventory/govbot-postgres-db.ini',
+        group: 'govbot_postgres_db',
+        playbook: 'ansible/playbooks/deploy-govbot-postgres-db.yml',
+        ip: '192.168.1.134',
+        rootFolderName: 'govbot-postgres-db',
+        env: [
+            [credentialId: 'govbot-postgres-admin-password', varName: 'POSTGRES_ADMIN_PASSWORD'],
+            [credentialId: 'govbot-postgres-ingest-password', varName: 'GOVBOT_INGEST_PASSWORD'],
+            [credentialId: 'govbot-postgres-app-password', varName: 'GOVBOT_APP_PASSWORD']
+        ]
     ]
 ]
 

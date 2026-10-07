@@ -1,0 +1,125 @@
+- name: Deploy govbot postgres db
+  hosts: govbot_postgres_db
+  become: true
+
+  vars:
+    app_dir: /opt/govbot-postgres-db
+    data_root: /srv/govbot-postgres-db
+    container_name: govbot-postgres-db
+
+  tasks:
+    - name: Configure DNS
+      ansible.builtin.copy:
+        dest: /etc/resolv.conf
+        content: |
+          nameserver 192.168.1.1
+          nameserver 1.1.1.1
+        owner: root
+        group: root
+        mode: "0644" # rw-r--r--: owner (root) can read/write, group and others read-only
+
+    - name: Install Docker and Docker Compose
+      ansible.builtin.apt:
+        name:
+          - docker.io
+          - docker-compose
+        state: present
+        update_cache: true
+
+    - name: Enable Docker
+      ansible.builtin.service:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Create application directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        mode: "0755"
+      loop:
+        - "{{ app_dir }}"
+        - "{{ app_dir }}/config"
+
+    # Persistent data: only ever created, never copied over, so deploys don't touch the contents.
+    # data/ must stay traversable - the postgres entrypoint creates and locks down its own
+    # 18/docker directory underneath it.
+    - name: Create data directories
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: directory
+        owner: root
+        group: root
+        mode: "{{ item.mode }}"
+      loop:
+        - { path: "{{ data_root }}", mode: "0755" }
+        - { path: "{{ data_root }}/data", mode: "0755" }
+        - { path: "{{ data_root }}/backups", mode: "0700" }
+
+    - name: Copy Docker Compose project files
+      ansible.builtin.copy:
+        src: "../../govbot-postgres-db/{{ item }}"
+        dest: "{{ app_dir }}/{{ item }}"
+        mode: "0644"
+      loop:
+        - compose.yml
+        - migrations/
+        - scripts/
+
+    - name: Copy pg_hba.conf
+      ansible.builtin.copy:
+        src: ../../govbot-postgres-db/config/pg_hba.conf
+        dest: "{{ app_dir }}/config/pg_hba.conf"
+        mode: "0644"
+      register: pg_hba
+
+    - name: Copy Docker env file
+      ansible.builtin.copy:
+        src: ../../govbot-postgres-db/.env
+        dest: "{{ app_dir }}/.env"
+        mode: "0600"
+      no_log: true # holds the database passwords
+
+    - name: Start Docker Compose project
+      community.docker.docker_compose_v2:
+        project_src: "{{ app_dir }}"
+        state: present
+        pull: missing
+        remove_orphans: true
+        # there is no HTTP endpoint for Jenkins to check, so fail the deploy here if postgres
+        # doesn't become healthy
+        wait: true
+
+    # Compose doesn't restart the container for a changed config file, and postgres only reads
+    # pg_hba.conf on start or reload
+    - name: Reload pg_hba.conf
+      ansible.builtin.command: >-
+        docker exec {{ container_name }}
+        psql --username govbot_db_admin --dbname govbot --command "SELECT pg_reload_conf()"
+      when: pg_hba.changed
+
+    # Always re-sets the passwords, so there's never anything meaningful to report as changed
+    - name: Sync database roles
+      ansible.builtin.command: docker exec {{ container_name }} sh /scripts/sync-roles.sh
+      changed_when: false
+
+    - name: Apply schema migrations
+      ansible.builtin.command: docker exec {{ container_name }} sh /scripts/migrate.sh
+      register: migrate
+      changed_when: "'Applied ' in migrate.stdout"
+
+    - name: Install backup script
+      ansible.builtin.copy:
+        src: ../../govbot-postgres-db/backup.sh
+        dest: /usr/local/sbin/govbot-postgres-db-backup
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: Schedule nightly backup
+      ansible.builtin.cron:
+        name: govbot-postgres-db nightly backup
+        user: root
+        minute: "30"
+        hour: "2"
+        job: /usr/local/sbin/govbot-postgres-db-backup >> /var/log/govbot-postgres-db-backup.log 2>&1
