@@ -72,7 +72,9 @@ def services = [
         rootFolderName: 'rag-api',
         env: [
             [credentialId: 'openai-api-key', varName: 'OPENAI_API_KEY'],
-            [credentialId: 'govbot-cf-worker-api-key', varName: 'CLOUDFLARE_WORKER_API_KEY']
+            [credentialId: 'govbot-cf-worker-api-key', varName: 'CLOUDFLARE_WORKER_API_KEY'],
+            // same credential as govbot-postgres-db's app role
+            [credentialId: 'govbot-postgres-app-password', varName: 'GOVBOT_APP_PASSWORD']
         ]
     ],
     // database with no HTTP port - its playbook waits for the container to be healthy instead
