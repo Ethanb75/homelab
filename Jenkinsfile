@@ -58,7 +58,9 @@ def services = [
         ip: '192.168.1.132',
         rootFolderName: 'knowledge-ingest',
         env: [
-            [credentialId: 'openai-api-key', varName: 'OPENAI_API_KEY']
+            [credentialId: 'openai-api-key', varName: 'OPENAI_API_KEY'],
+            // same credential as govbot-postgres-db's ingest role
+            [credentialId: 'govbot-postgres-ingest-password', varName: 'GOVBOT_INGEST_PASSWORD']
         ]
     ],
     'rag-api': [
