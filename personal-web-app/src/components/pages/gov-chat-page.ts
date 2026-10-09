@@ -2,6 +2,8 @@ import { state } from '@lit/reactive-element/decorators/state.js';
 import { LitElement, css, html } from 'lit'
 import type { PropertyValues } from 'lit'
 import { createRef, ref } from 'lit/directives/ref.js'
+import { unsafeHTML } from 'lit/directives/unsafe-html.js'
+import MarkdownIt from 'markdown-it'
 import { AtomsStyles } from '../atoms.css.ts'
 import PageStyles from '../page.css.ts'
 
@@ -10,6 +12,16 @@ const MAX_MESSAGE_LENGTH = 4000
 const MAX_MESSAGES = 20
 // each past turn is a user + assistant pair, leaving room for the current question
 const MAX_HISTORY_TURNS = Math.floor((MAX_MESSAGES - 1) / 2)
+
+// html: false escapes raw HTML in the model output, so unsafeHTML only ever sees markdown-it's own tags
+const md = new MarkdownIt({ html: false, linkify: true, breaks: true })
+
+// open links in a new tab so the in-memory chat isn't lost
+md.renderer.rules.link_open = (tokens, idx, options, _env, self) => {
+  tokens[idx].attrSet('target', '_blank')
+  tokens[idx].attrSet('rel', 'noopener noreferrer')
+  return self.renderToken(tokens, idx, options)
+}
 
 interface Message {
   role: 'user' | 'assistant'
@@ -25,6 +37,8 @@ interface Source {
 interface Turn {
   question: string
   answer: string
+  // rendered markdown, only set once the answer finishes streaming
+  answerHtml?: string
   sources: Source[]
   model?: string
   error?: string
@@ -46,6 +60,81 @@ const GovChatPageStyles = css`
   .question, .answer {
     white-space: pre-wrap;
     margin: 0.25rem 0 1rem 0;
+  }
+
+  .answer.markdown {
+    white-space: normal;
+  }
+
+  .markdown > :first-child {
+    margin-top: 0;
+  }
+
+  .markdown > :last-child {
+    margin-bottom: 0;
+  }
+
+  .markdown p, .markdown ul, .markdown ol, .markdown pre, .markdown table {
+    margin: 0.5rem 0;
+  }
+
+  .markdown ul, .markdown ol {
+    padding-left: 1.25rem;
+  }
+
+  .markdown li + li {
+    margin-top: 0.25rem;
+  }
+
+  .markdown h1, .markdown h2, .markdown h3, .markdown h4 {
+    margin: 1rem 0 0.5rem 0;
+    font-size: 1.1rem;
+  }
+
+  .markdown h1 {
+    font-size: 1.3rem;
+  }
+
+  .markdown h2 {
+    font-size: 1.2rem;
+  }
+
+  .markdown a {
+    color: var(--color-primary);
+  }
+
+  .markdown code {
+    font-size: 0.9em;
+    padding: 0 0.2rem;
+    border: 1px solid var(--color-secondary);
+  }
+
+  .markdown pre {
+    padding: 0.5rem;
+    overflow-x: auto;
+    border: 1px solid var(--color-secondary);
+  }
+
+  .markdown pre code {
+    padding: 0;
+    border: none;
+  }
+
+  .markdown table {
+    display: block;
+    overflow-x: auto;
+    border-collapse: collapse;
+  }
+
+  .markdown th, .markdown td {
+    padding: 0.25rem 0.5rem;
+    border: 1px solid var(--color-secondary);
+  }
+
+  .markdown blockquote {
+    margin: 0.5rem 0;
+    padding-left: 0.75rem;
+    border-left: 2px solid var(--color-secondary);
   }
 
   .error {
@@ -316,6 +405,7 @@ export class GovChatPage extends LitElement {
       case 'sources':
         this.updateLastTurn({ sources: payload })
         return false
+      // the text stream
       case 'delta':
         this.updateLastTurn({ answer: this.lastTurn.answer + payload.text })
         return false
@@ -323,6 +413,7 @@ export class GovChatPage extends LitElement {
         this.updateLastTurn({ error: payload.message ?? 'Something went wrong' })
         return true
       case 'done':
+        this.updateLastTurn({ answerHtml: md.render(this.lastTurn.answer) })
         return true
       default:
         return false
@@ -341,10 +432,14 @@ export class GovChatPage extends LitElement {
     `
   }
 
-  // maybe use me to change content to links?
-  private renderAnswer(answer: string) {
-    // for now just return answer
-    return answer
+  // plain text while streaming, markdown once the answer is done
+  private renderAnswer(turn: Turn) {
+    // done! render markdown
+    if (turn.answerHtml) {
+      return html`<div class="answer markdown">${unsafeHTML(turn.answerHtml)}</div>`
+    }
+    return html`<p class="answer">${turn.answer
+      || (this.pending && turn === this.lastTurn && !turn.error ? '...' : '')}</p>`
   }
 
   private renderTurn(turn: Turn) {
@@ -352,11 +447,9 @@ export class GovChatPage extends LitElement {
       <div class="turn">
         <span class="label">&gt; you:</span>
         <p class="question">${turn.question}</p>
-        <span class="label">&gt; 🤖:</span>
-        ${turn.model ? html`<span class="model">${turn.model}</span>` : null}
-        <p class="answer">${(turn.answer && this.renderAnswer(turn.answer))
-          || 
-          (this.pending && turn === this.lastTurn && !turn.error ? '...' : '')}</p>
+        <span class="label">&gt; ${`${turn.model || ""} - GovBot 🤖:`}</span>
+
+        ${this.renderAnswer(turn)}
         ${turn.error ? html`<p class="error">${turn.error}</p>` : null}
         ${this.renderSources(turn.sources)}
       </div>
