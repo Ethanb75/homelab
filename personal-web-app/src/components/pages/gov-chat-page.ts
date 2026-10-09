@@ -5,8 +5,16 @@ import { createRef, ref } from 'lit/directives/ref.js'
 import { AtomsStyles } from '../atoms.css.ts'
 import PageStyles from '../page.css.ts'
 
-// matches MAX_MESSAGE_LENGTH in rag-api/src/routes/schemas.ts
+// matches MAX_MESSAGE_LENGTH and MAX_MESSAGES in rag-api/src/routes/schemas.ts
 const MAX_MESSAGE_LENGTH = 4000
+const MAX_MESSAGES = 20
+// each past turn is a user + assistant pair, leaving room for the current question
+const MAX_HISTORY_TURNS = Math.floor((MAX_MESSAGES - 1) / 2)
+
+interface Message {
+  role: 'user' | 'assistant'
+  content: string
+}
 
 interface Source {
   source: string
@@ -153,7 +161,7 @@ const errorForStatus = (status: number, body: any): string => {
 export class GovChatPage extends LitElement {
   static styles = [PageStyles, GovChatPageStyles, AtomsStyles]
 
-  // kept in memory only, each request sends just the current question
+  // kept in memory only, each request sends recent completed turns as history
   @state()
   private turns: Turn[] = []
 
@@ -225,8 +233,20 @@ export class GovChatPage extends LitElement {
     this.ask(question)
   }
 
+  // failed or empty answers are skipped, rag-api rejects empty content
+  private buildHistory(): Message[] {
+    return this.turns
+      .filter(turn => !turn.error && turn.answer.trim())
+      .slice(-MAX_HISTORY_TURNS)
+      .flatMap((turn): Message[] => [
+        { role: 'user', content: turn.question },
+        { role: 'assistant', content: turn.answer.slice(0, MAX_MESSAGE_LENGTH) },
+      ])
+  }
+
   private async ask(question: string) {
     this.pending = true
+    const messages: Message[] = [...this.buildHistory(), { role: 'user', content: question }]
     this.turns = [...this.turns, { question, answer: '', sources: [] }]
     const controller = new AbortController()
     this.abortController = controller
@@ -235,7 +255,7 @@ export class GovChatPage extends LitElement {
       const res = await fetch('/api/v1/rag/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: [{ role: 'user', content: question }], stream: true }),
+        body: JSON.stringify({ messages, stream: true }),
         signal: controller.signal,
       })
 
