@@ -294,6 +294,7 @@ export class GovChatPage extends LitElement {
       while ((boundary = buffer.indexOf('\n\n')) !== -1) {
         const block = buffer.slice(0, boundary)
         buffer = buffer.slice(boundary + 2)
+        
         if (this.handleEvent(block)) return true
       }
     }
