@@ -189,6 +189,16 @@ const GovChatPageStyles = css`
     gap: 0.5rem;
   }
 
+  .chat-sample-button {
+    position: relative;
+    left: -1rem;
+    background: transparent;
+    color: var(--color-main-text);
+    opacity: 0.6;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+  }
+
   textarea {
     font: inherit;
     letter-spacing: inherit;
@@ -481,8 +491,20 @@ export class GovChatPage extends LitElement {
           ${this.turns.map(turn => this.renderTurn(turn))}
           
         </div>
-        <form class="chat-form" @submit=${this.handleSubmit}>
+        <div>
+          ${this.turns.length === 0 ? html`<button @click=${() => {
+            const ta = this.textareaRef.value;
+            const form = this.renderRoot.querySelector('#chat-form') as HTMLFormElement;
+
+            if(!form || !ta) return;
+
+            ta.value = "What's your most recent GA executive order?"
+            form.requestSubmit();
+          }} class="chat-sample-button">try "What's your most recent GA executive order?"</button>`: ""}
+        </div>
+        <form id="chat-form" class="chat-form" @submit=${this.handleSubmit}>
           <textarea
+            id="chatbox"
             name="question"
             maxlength=${MAX_MESSAGE_LENGTH}
             placeholder="Ask a question..."
