@@ -502,10 +502,17 @@ export class GovChatPage extends LitElement {
             form.requestSubmit();
           }} class="chat-sample-button">try "What's your most recent GA executive order?"</button>`: ""}
         </div>
-        <form id="chat-form" class="chat-form" @submit=${this.handleSubmit}>
+        <form 
+          id="chat-form" 
+          class="chat-form" 
+          toolname="queryDocuments"
+          tooldescription="submits a query to govbot to summarize a government document"
+          @submit=${this.handleSubmit}
+        >
           <textarea
             id="chatbox"
             name="question"
+            toolparamdescription="question for govbot"
             maxlength=${MAX_MESSAGE_LENGTH}
             placeholder="Ask a question..."
             @keydown=${this.handleKeyDown}
