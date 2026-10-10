@@ -329,7 +329,14 @@ export class GovChatPage extends LitElement {
     if (!question || this.pending) return
 
     textarea.value = ''
-    this.ask(question)
+    this.ask(question);
+
+    // if agent invoked via webmcp, respond pleasantly
+    // @ts-ignore
+    if(event.agentInvoked) {
+      // @ts-ignore
+      event.respondWith(Promise.resolve(`Asked Govbot Successfully:\n\n${this.lastTurn.answer}`))
+    }
   }
 
   // failed or empty answers are skipped, rag-api rejects empty content
@@ -343,7 +350,7 @@ export class GovChatPage extends LitElement {
       ])
   }
 
-  private async ask(question: string) {
+  private async ask(question: string): Promise<undefined> {
     this.pending = true
     const messages: Message[] = [...this.buildHistory(), { role: 'user', content: question }]
     this.turns = [...this.turns, { question, answer: '', sources: [] }]
