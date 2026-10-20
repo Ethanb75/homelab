@@ -72,6 +72,18 @@ const MainStyles = css`
     outline: 2px solid var(--color-main-text);
     outline-offset: 2px;
   }
+
+  @media (max-width: 600px) {
+    .navigation {
+      width: 100vw;
+      margin: 1rem 0;
+    }
+    .navigation ul {
+      justify-content: center;
+      gap: 0.25rem;
+      left: initial;
+    }
+  }
 `;
 
 // only an explicit 'false' turns the block off, so new visitors and blocked storage get it

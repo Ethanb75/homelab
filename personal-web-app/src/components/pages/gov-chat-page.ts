@@ -246,6 +246,10 @@ const GovChatPageStyles = css`
     .gov-chat-page {
       padding: 15vw 0;
     }
+
+    .form-actions {
+      justify-content: flex-start;
+    }
   }
 `
 
