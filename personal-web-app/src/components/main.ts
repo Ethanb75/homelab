@@ -1,5 +1,6 @@
 import { property } from '@lit/reactive-element/decorators/property.js';
 import { query } from '@lit/reactive-element/decorators/query.js';
+import { state } from '@lit/reactive-element/decorators/state.js';
 import { LitElement, css, html } from 'lit';
 import './background-svg'
 import './link'
@@ -47,12 +48,49 @@ const MainStyles = css`
   .footer {
 
   }
+
+  .block-toggle {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 10; /* above content, below pixel-transition (1000) */
+    font: inherit;
+    font-size: 1.2rem;
+    color: var(--color-primary);
+    background: var(--color-background);
+    border: 1px solid var(--color-primary);
+    padding: 0.25rem 1rem;
+    cursor: pointer;
+  }
+
+  .block-toggle[aria-pressed="true"] {
+    color: var(--color-background);
+    background: var(--color-primary);
+  }
+
+  .block-toggle:focus-visible {
+    outline: 2px solid var(--color-main-text);
+    outline-offset: 2px;
+  }
 `;
+
+// only an explicit 'false' turns the block off, so new visitors and blocked storage get it
+const BLOCK_PREF_KEY = 'bg-block-enabled';
+const readBlockPref = () => {
+  try {
+    return localStorage.getItem(BLOCK_PREF_KEY) !== 'false';
+  } catch {
+    return true;
+  }
+};
 
 export class Main extends LitElement {
   @property({ type: String })
   public currentPage: string = window.location.pathname;
   static styles = [MainStyles, AtomsStyles];
+
+  @state()
+  private blockEnabled = readBlockPref();
 
   @query('pixel-transition')
   private pixelTransition?: PixelTransition;
@@ -78,6 +116,13 @@ export class Main extends LitElement {
 
   private handlePopState = () => {
     this.transitionTo(window.location.pathname, false);
+  };
+
+  private toggleBlock = () => {
+    this.blockEnabled = !this.blockEnabled;
+    try {
+      localStorage.setItem(BLOCK_PREF_KEY, String(this.blockEnabled));
+    } catch {}
   };
 
   private async transitionTo(path: string, updateHistory: boolean) {
@@ -126,7 +171,7 @@ export class Main extends LitElement {
 
   protected render() {
     return html`
-      <background-svg></background-svg>
+      <background-svg ?animated=${this.blockEnabled}></background-svg>
       <pixel-transition></pixel-transition>
       <!-- navigation -->
       <nav class="navigation">
@@ -152,6 +197,11 @@ export class Main extends LitElement {
         </div>
         <p>copyright &copy; 2026 Ethan Bellora</p>
       </footer>
+      <button type="button" class="block-toggle"
+        aria-pressed=${this.blockEnabled}
+        @click=${this.toggleBlock}>
+        ${this.blockEnabled ? 'block: on' : 'block: off'}
+      </button>
     `
   }
 }
