@@ -41,6 +41,8 @@ const LinkStyles = css`
   }
 `;
 
+const isExternal = (href: string) => /^https?:\/\//.test(href);
+
 export class AppLink extends LitElement {
   static styles = [LinkStyles];
 
@@ -54,7 +56,7 @@ export class AppLink extends LitElement {
   public nav: boolean = false;
 
   private updateActive = () => {
-    this.active = window.location.pathname === this.href;
+    this.active = !isExternal(this.href) && window.location.pathname === this.href;
   };
 
   connectedCallback() {
@@ -69,6 +71,11 @@ export class AppLink extends LitElement {
   }
 
   private handleClick(event: Event) {
+    // other sites get normal browser navigation, not the in-app transition
+    if (isExternal(this.href)) {
+      return;
+    }
+
     event.preventDefault();
 
     this.dispatchEvent(
